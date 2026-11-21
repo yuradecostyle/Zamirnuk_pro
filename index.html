@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>StoneScan Pro — Заміри та Розкрій Каменю і Керамограніту</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --sky: #0284c7;
+      --sky-soft: #f0f9ff;
+      --orange: #ea580c;
+      --orange-soft: #fff7ed;
+      --teal: #0d9488;
+      --teal-soft: #f0fdfa;
+      --violet: #7c3aed;
+      --violet-soft: #f5f3ff;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --emerald: #059669;
+      --rose: #e11d48;
+      --rose-soft: #fff1f2;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--ink);
+      min-height: 100vh; display: flex; flex-direction: column;
+      overflow-x: hidden;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .hidden { display: none !important; }
+
+    /* Header & Nav */
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: #0f172a; color: #fff;
+      box-shadow: 0 2px 10px rgba(15,23,42,0.2);
+    }
+    .header-inner {
+      max-width: 1160px; margin: 0 auto; padding: 0 14px;
+      height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.4);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      color: #38bdf8; font-weight: 800; font-size: 14px;
+    }
+    .brand-title { font-weight: 800; font-size: 15px; letter-spacing: -0.02em; }
+    .brand-sub { font-size: 11px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+    .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    nav.desktop-nav {
+      display: none; background: #fff; border-bottom: 1px solid var(--border);
+      position: sticky; top: 56px; z-index: 20;
+    }
+    @media (min-width: 768px) { nav.desktop-nav { display: block; } }
+    .desktop-nav-inner {
+      max-width: 1160px; margin: 0 auto; padding: 0 16px;
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-tabs { display: flex; gap: 4px; }
+
+    main {
+      flex: 1; max-width: 1160px; width: 100%; margin: 0 auto;
+      padding: 14px 12px 92px;
+    }
+    @media (min-width: 768px) { main { padding: 18px 16px 40px; } }
+
+    /* Mobile Bottom Nav */
+    nav.mobile-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border); height: 64px;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      box-shadow: 0 -2px 10px rgba(15,23,42,0.08);
+    }
+    @media (min-width: 768px) { nav.mobile-nav { display: none; } }
+    .mobile-nav-btn {
+      border: none; background: transparent; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+    }
+    .mobile-nav-btn.active { color: var(--sky); }
+
+    /* Cards & Layout */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 14px; box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .stack { display: flex; flex-direction: column; gap: 14px; }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .row-between { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+
+    .grid-scan { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: start; }
+    @media (min-width: 1024px) { .grid-scan { grid-template-columns: 7fr 5fr; } }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 640px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+    .grid-5 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    @media (min-width: 1024px) { .grid-5 { grid-template-columns: repeat(5, 1fr); } }
+
+    /* Buttons & Inputs */
+    button { font-family: inherit; cursor: pointer; }
+    .btn {
+      border: 1px solid var(--border); background: #f8fafc; color: var(--ink);
+      border-radius: 10px; padding: 7px 12px; font-size: 12px; font-weight: 600;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: #e2e8f0; }
+    .btn-dark { background: #0f172a; color: #fff; border-color: #0f172a; }
+    .btn-dark:hover { background: #1e293b; }
+    .btn-sky { background: var(--sky); color: #fff; border-color: var(--sky); }
+    .btn-sky:hover { background: #0369a1; }
+    .btn-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .btn-orange:hover { background: #c2410c; }
+    .btn-emerald { background: var(--emerald); color: #fff; border-color: var(--emerald); }
+    .btn-emerald:hover { background: #047857; }
+    .btn-teal { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .btn-violet { background: var(--violet); color: #fff; border-color: var(--violet); }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--muted); }
+    .btn-ghost:hover { background: #f1f5f9; color: var(--ink); }
+    .btn-ghost.active { background: var(--sky-soft); color: var(--sky); }
+    .btn-sm { padding: 5px 9px; font-size: 11px; border-radius: 8px; }
+
+    label.field-label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      margin-bottom: 4px;
+    }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; border: 1px solid #cbd5e1; border-radius: 10px;
+      padding: 7px 10px; font-size: 13px; font-weight: 600; color: var(--ink);
+      background: #fff; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--sky); box-shadow: 0 0 0 2px rgba(2,132,199,0.15); }
+
+    /* Scanner Viewport */
+    .scanner-card {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
+      overflow: hidden; color: #fff;
+    }
+    .scanner-bar {
+      padding: 10px 12px; background: #020617; border-bottom: 1px solid #1e293b;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .scanner-viewport {
+      position: relative; width: 100%; height: 350px;
+      background-color: #0b192c;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.08) 1px, transparent 1px),
+        linear-gradient(rgba(56,189,248,0.16) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.16) 1px, transparent 1px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+      user-select: none; overflow: hidden;
+    }
+    @media (min-width: 640px) { .scanner-viewport { height: 400px; } }
+    #cameraVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.72; }
+    #scannerCanvas { position: relative; z-index: 10; width: 100%; height: 100%; cursor: crosshair; touch-action: none; display: block; }
+    .scan-hint {
+      position: absolute; top: 10px; left: 10px; z-index: 20;
+      background: rgba(2,6,23,0.82); border: 1px solid #334155; border-radius: 10px;
+      padding: 6px 10px; font-size: 11px; color: #e2e8f0; max-width: 88%; pointer-events: none;
+    }
+    .scan-bottom {
+      position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; pointer-events: none;
+    }
+    .scan-bottom > * { pointer-events: auto; }
+    .scan-stat {
+      background: rgba(2,6,23,0.88); border: 1px solid #334155; border-radius: 10px;
+      padding: 5px 10px; font-size: 11px; display: flex; gap: 8px; align-items: center;
+    }
+    .scanner-foot {
+      padding: 8px 12px; background: #020617; font-size: 11px; color: #94a3b8;
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+    }
+    .dot { width: 9px; height: 9px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+
+    /* Edge buttons */
+    .edge-btn {
+      border: 1px solid var(--border); background: #f8fafc; color: #475569;
+      border-radius: 8px; padding: 6px 8px; font-size: 11px; font-weight: 600;
+      display: flex; align-items: center; justify-content: space-between; gap: 4px;
+    }
+    .edge-btn.active-miter { background: var(--orange-soft); border-color: var(--orange); color: #c2410c; }
+    .edge-btn.active-polish { background: var(--sky-soft); border-color: var(--sky); color: #0369a1; }
+
+    /* Sub-panels */
+    .box-soft { border-radius: 12px; padding: 10px; border: 1px solid var(--border); background: #f8fafc; }
+    .box-orange { background: var(--orange-soft); border-color: #fed7aa; }
+    .box-teal { background: var(--teal-soft); border-color: #99f6e4; }
+    .box-violet { background: var(--violet-soft); border-color: #ddd6fe; }
+    .box-amber { background: var(--amber-soft); border-color: #fde68a; }
+    .box-sky { background: var(--sky-soft); border-color: #bae6fd; }
+    .box-rose { background: var(--rose-soft); border-color: #fecdd3; }
+
+    /* Blueprint */
+    .bp-wrap { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; background: #fff; }
+    .bp-wrap.dark { background: #0b192c; border-color: #334155; }
+    .bp-head { background: #0f172a; color: #fff; padding: 10px 14px; font-size: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+    .bp-body { padding: 14px; overflow-x: auto; display: flex; justify-content: center; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; padding: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: #f8fafc; border-bottom: 1px solid var(--border); }
+    td { padding: 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+
+    /* KPI */
+    .kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .kpi-val { font-size: 22px; font-weight: 800; margin-top: 4px; }
+    .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Orientation buttons */
+    .orient-btn {
+      border: 2px solid var(--border); background: #fff; color: var(--ink);
+      border-radius: 12px; padding: 10px; text-align: left;
+    }
+    .orient-btn.active { border-color: var(--orange); background: var(--orange-soft); color: #7c2d12; }
+
+    /* Toast */
+    #toastContainer { position: fixed; top: 64px; right: 14px; z-index: 60; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+    .toast {
+      padding: 9px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: opacity 0.25s, transform 0.25s;
+    }
+
+    /* Cutout scroll */
+    .scroll-list { max-height: 430px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* Print / PDF Mode */
+    #printSheet { display: none; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; }
+      #printSheet { display: block !important; padding: 0; }
+      .print-page-break { page-break-before: always; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="no-print">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">SS</div>
+        <div style="min-width:0">
+          <div class="brand-title">StoneScan Pro <span style="font-size:10px;font-weight:600;color:#38bdf8;margin-left:4px">CAD &amp; Розкрій</span></div>
+          <div id="headerProjectName" class="brand-sub">ЖК Парус — Кухня + Острів</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btnQuickSave" type="button" class="btn btn-dark" style="border-color:#334155">💾 Зберегти</button>
+        <button id="btnQuickPdf" type="button" class="btn btn-sky">📄 PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Desktop Nav -->
+  <nav class="desktop-nav no-print">
+    <div class="desktop-nav-inner">
+      <div class="nav-tabs">
+        <button data-tab="scan" class="nav-tab-btn btn btn-ghost">1. Замір / Скан</button>
+        <button data-tab="blueprint" class="nav-tab-btn btn btn-ghost">2. 2D Креслення</button>
+        <button data-tab="nesting" class="nav-tab-btn btn btn-ghost">3. Розкрій плити</button>
+        <button data-tab="projects" class="nav-tab-btn btn btn-ghost">4. Проєкти та PDF</button>
+      </div>
+      <div id="navStatsSummary" class="mono" style="font-size:12px;color:#475569;font-weight:600">0 дет. • 0 м²</div>
+    </div>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="no-print">
+
+    <!-- ==================== TAB 1: SCAN & MEASURE ==================== -->
+    <section id="tab-scan" class="tab-panel stack">
+      <div class="card row-between">
+        <div class="row">
+          <button data-zone="countertop" class="zone-pill btn">Стільниця</button>
+          <button data-zone="backsplash" class="zone-pill btn">Фартух</button>
+          <button data-zone="island" class="zone-pill btn">Острів</button>
+        </div>
+        <div class="row">
+          <button id="btnToggleCamera" type="button" class="btn btn-dark"><span id="cameraBtnLabel">📷 Камера AR</span></button>
+          <button id="btnGoToBlueprint" type="button" class="btn btn-sky">2D Креслення →</button>
+        </div>
+      </div>
+
+      <div class="grid-scan">
+        <!-- Scanner -->
+        <div class="scanner-card">
+          <div class="scanner-bar">
+            <div style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">
+              <span style="width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block"></span>
+              <span id="scanModeBadge">Інтерактивне сканування площини</span>
+            </div>
+            <div class="row" style="gap:4px">
+              <button data-tool="measure" class="scan-tool-btn btn btn-sm">Точки</button>
+              <button data-tool="sink" class="scan-tool-btn btn btn-sm">Мийка</button>
+              <button data-tool="hob" class="scan-tool-btn btn btn-sm">Варочна</button>
+              <button data-tool="socket" class="scan-tool-btn btn btn-sm">Розетка</button>
+            </div>
+          </div>
+
+          <div class="scanner-viewport" id="scannerViewport">
+            <video id="cameraVideo" class="hidden" autoplay playsinline muted></video>
+            <canvas id="scannerCanvas"></canvas>
+            <div class="scan-hint"><span id="scannerHintText">Натисніть на площину, щоб поставити точку заміру.</span></div>
+            <div class="scan-bottom">
+              <div class="scan-stat">
+                <span style="color:#94a3b8">Точок:</span>
+                <strong id="scanPointCount" class="mono" style="color:#38bdf8">0</strong>
+                <span style="color:#475569">|</span>
+                <strong id="scanLastDistance" class="mono" style="color:#34d399">— мм</strong>
+              </div>
+              <div class="row" style="gap:6px">
+                <button id="btnApplyScanPoints" type="button" class="btn btn-sm btn-emerald hidden">Застосувати замір</button>
+                <button id="btnClearScanPoints" type="button" class="btn btn-sm btn-dark" style="border-color:#475569">Скинути точки</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="scanner-foot">
+            <div class="row" style="gap:12px">
+              <span><span class="dot" style="background:#f97316"></span>Зарізка 45°</span>
+              <span><span class="dot" style="background:#38bdf8"></span>Полірування</span>
+              <span><span class="dot" style="background:#fbbf24;border-radius:50%"></span>Розетки / Бар</span>
+            </div>
+            <span class="mono">Точність: ±1 мм</span>
+          </div>
+        </div>
+
+        <!-- Right Parametric Editor -->
+        <div class="stack">
+          <div class="card stack">
+            <div class="row-between">
+              <h2 id="activeZoneTitle" style="margin:0;font-size:15px;font-weight:800">Параметри стільниці</h2>
+              <label style="font-size:12px;font-weight:600;color:#475569;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+                <input id="chkZoneEnabled" type="checkbox" checked /> У проєкті
+              </label>
+            </div>
+            <div id="zoneFormContainer" class="stack"></div>
+          </div>
+
+          <div class="card stack">
+            <div class="row-between">
+              <h3 id="cutoutsCardTitle" style="margin:0;font-size:14px;font-weight:800">Вирізи та розетки</h3>
+              <div id="quickAddCutoutBtns" class="row" style="gap:6px"></div>
+            </div>
+            <div id="cutoutsListContainer" class="scroll-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: 2D BLUEPRINT ==================== -->
+    <section id="tab-blueprint" class="tab-panel hidden stack">
+      <div class="card row-between">
+        <div class="row">
+          <button data-bp="all" class="bp-filter-btn btn btn-sm">Усі елементи</button>
+          <button data-bp="countertop" class="bp-filter-btn btn btn-sm">Стільниця</button>
+          <button data-bp="backsplash" class="bp-filter-btn btn btn-sm">Фартух</button>
+          <button data-bp="island" class="bp-filter-btn btn btn-sm">Острів + Переріз</button>
+        </div>
+        <div class="row">
+          <button id="btnBlueprintTheme" type="button" class="btn btn-sm"><span id="bpThemeLabel">Світлий CAD</span></button>
+          <button id="btnRunNestingFromBp" type="button" class="btn btn-orange">Розкроїти плиту →</button>
+        </div>
+      </div>
+
+      <div id="blueprintCanvasWrapper" class="bp-wrap">
+        <div class="bp-head">
+          <div><strong style="color:#38bdf8">2D РОБОЧЕ КРЕСЛЕННЯ</strong> | Усі розміри в мм</div>
+          <div class="mono" style="font-size:11px;color:#cbd5e1">Помаранчевий: 45° • Синій: Полір. • Червоний: Виріз</div>
+        </div>
+        <div id="blueprintSvgHost" class="bp-body"></div>
+      </div>
+
+      <div class="card">
+        <div class="row-between" style="margin-bottom:10px">
+          <h3 style="margin:0;font-size:15px;font-weight:800">Специфікація деталей на виробництво</h3>
+          <span id="specPartsCount" class="mono" style="font-size:12px;color:#64748b">0 поз.</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Код</th><th>Елемент</th><th>Розмір (мм)</th><th>Площа</th><th>Торці / 45°</th><th>Вирізи / Отвори</th>
+              </tr>
+            </thead>
+            <tbody id="specTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: SLAB NESTING ==================== -->
+    <section id="tab-nesting" class="tab-panel hidden stack">
+      <div class="card stack">
+        <div class="row-between">
+          <h2 style="margin:0;font-size:16px;font-weight:800">Параметри плити та розкрою</h2>
+          <button id="btnExecuteNesting" type="button" class="btn btn-orange" style="padding:9px 18px;font-size:13px">✂️ Розкроїти</button>
+        </div>
+
+        <div class="grid-4">
+          <div>
+            <label class="field-label">Матеріал</label>
+            <select id="slabMaterialSelect">
+              <option value="Керамограніт великоформатний">Керамограніт великоформатний</option>
+              <option value="Кварцит / Кварцовий агломерат">Кварцит / Кварцовий агломерат</option>
+              <option value="Натуральний граніт">Натуральний граніт</option>
+              <option value="Натуральний мармур">Натуральний мармур</option>
+              <option value="Акриловий камінь">Акриловий камінь</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Формат плити (пресет)</label>
+            <select id="slabPresetSelect">
+              <option value="3200x1600">3200 × 1600 мм (Керамограніт XL)</option>
+              <option value="3000x1400">3000 × 1400 мм (Кварцит стандарт)</option>
+              <option value="3050x1440">3050 × 1440 мм (Caesarstone / Silestone)</option>
+              <option value="2400x1200">2400 × 1200 мм (Керамограніт L)</option>
+              <option value="custom">Власний розмір...</option>
+            </select>
+          </div>
+          <div class="grid-2">
+            <div><label class="field-label">Довжина (мм)</label><input id="slabLengthInput" type="number" min="600" max="4500" step="10" class="mono" /></div>
+            <div><label class="field-label">Ширина (мм)</label><input id="slabWidthInput" type="number" min="400" max="2500" step="10" class="mono" /></div>
+          </div>
+          <div class="grid-3">
+            <div>
+              <label class="field-label">Товщ.</label>
+              <select id="slabThicknessSelect" class="mono"><option value="6">6</option><option value="12">12</option><option value="20">20</option><option value="30">30</option></select>
+            </div>
+            <div><label class="field-label">Різ</label><input id="slabKerfInput" type="number" min="1" max="10" step="1" class="mono" /></div>
+            <div><label class="field-label">Обріз</label><input id="slabTrimInput" type="number" min="0" max="50" step="5" class="mono" /></div>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label">Варіант порізки елементів</label>
+          <div class="grid-3">
+            <button data-orient="horizontal" type="button" class="orient-btn">
+              <div style="font-weight:800;font-size:13px">↔ По горизонталі (0°)</div>
+              <div style="font-size:11px;opacity:0.8;margin-top:2px">Уздовж довгої сторони, єдиний напрям прожилок</div>
+            </button>
+            <button data-orient="vertical" type="button" class="orient-btn">
+              <div style="font-weight:800;font-size:13px">↕ По вертикалі (90°)</div>
+              <div style="font-size:11px;opacity:0.8;margin-top:2px">Поперек плити, поворот елементів на 90°</div>
+            </button>
+            <button data-orient="optimal" type="button" class="orient-btn">
+              <div style="font-weight:800;font-size:13px">✦ Оптимально (Авто)</div>
+              <div style="font-size:11px;opacity:0.8;margin-top:2px">Мінімум плит та відходів, поворот 0°/90°</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-5">
+        <div class="card"><div class="kpi-label">Плит потрібно</div><div id="kpiSlabsCount" class="kpi-val mono">0</div><div id="kpiSlabDim" class="kpi-sub">3200×1600 мм</div></div>
+        <div class="card"><div class="kpi-label">Використання</div><div id="kpiUtilization" class="kpi-val mono" style="color:var(--emerald)">0%</div><div id="kpiWaste" class="kpi-sub">Залишок: 0%</div></div>
+        <div class="card"><div class="kpi-label">Площа деталей</div><div id="kpiPartsArea" class="kpi-val mono" style="color:var(--sky)">0 м²</div><div id="kpiTotalSlabArea" class="kpi-sub">Плит: 0 м²</div></div>
+        <div class="card"><div class="kpi-label">Довжина різу</div><div id="kpiCutLength" class="kpi-val mono">0 м.п.</div><div class="kpi-sub">Прямий різ</div></div>
+        <div class="card box-orange"><div class="kpi-label" style="color:#c2410c">Зарізка 45°</div><div id="kpiMiterLength" class="kpi-val mono" style="color:var(--orange)">0 м.п.</div><div id="kpiPolishLength" class="kpi-sub" style="color:#9a3412">Полір.: 0 м.п.</div></div>
+      </div>
+
+      <div id="nestingWarningBox" class="card box-rose hidden" style="color:#9f1239;font-size:12px">
+        <div id="nestingWarningText"></div>
+      </div>
+
+      <div id="slabsRenderContainer" class="stack"></div>
+
+      <div class="card row-between" style="background:#0f172a;color:#fff;border-color:#1e293b">
+        <div>
+          <div style="font-weight:800;font-size:14px">Готово до передачі на виробництво</div>
+          <div style="font-size:12px;color:#94a3b8">PDF містить креслення 2D, специфікацію вирізів/45°, фото моделей та карти розкрою.</div>
+        </div>
+        <div class="row">
+          <button id="btnSaveFromNesting" type="button" class="btn btn-dark" style="border-color:#334155">💾 Зберегти проєкт</button>
+          <button id="btnDownloadPdfFromNesting" type="button" class="btn btn-sky">📄 Скачати PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: PROJECTS & PDF ==================== -->
+    <section id="tab-projects" class="tab-panel hidden stack">
+      <div class="grid-scan">
+        <div class="card stack">
+          <div class="row-between">
+            <h2 style="margin:0;font-size:15px;font-weight:800">Паспорт проєкту (ТЗ на виробництво)</h2>
+            <button id="btnNewProject" type="button" class="btn btn-sm">+ Новий замір</button>
+          </div>
+          <div class="grid-2">
+            <div style="grid-column:span 2"><label class="field-label">Назва проєкту / Об'єкт</label><input id="metaProjectName" type="text" /></div>
+            <div><label class="field-label">Клієнт / Дизайнер</label><input id="metaClient" type="text" /></div>
+            <div><label class="field-label">Замірник</label><input id="metaMeasurer" type="text" /></div>
+            <div><label class="field-label">Адреса об'єкта</label><input id="metaAddress" type="text" /></div>
+            <div><label class="field-label">Декор / Колір плити</label><input id="metaDecor" type="text" /></div>
+            <div style="grid-column:span 2"><label class="field-label">Примітки для виробництва / монтажу</label><textarea id="metaNotes" rows="2"></textarea></div>
+          </div>
+
+          <div class="grid-2">
+            <button id="btnSaveProjectMain" type="button" class="btn btn-emerald" style="padding:10px">💾 Зберегти проєкт</button>
+            <button id="btnExportPdfMain" type="button" class="btn btn-sky" style="padding:10px">📄 Скачати PDF</button>
+          </div>
+
+          <div class="box-soft stack" style="gap:8px">
+            <div class="row-between">
+              <strong style="font-size:12px">📁 Папка WorkSSD (StoneScan_Projects/projects)</strong>
+              <span id="workSsdFolderStatus" class="mono" style="font-size:11px;color:#64748b">Не підключено</span>
+            </div>
+            <div class="row">
+              <button id="btnPickWorkSsdFolder" type="button" class="btn btn-sm btn-dark">Обрати папку на WorkSSD</button>
+              <button id="btnExportJson" type="button" class="btn btn-sm">Експорт JSON</button>
+              <label class="btn btn-sm" style="cursor:pointer">Імпорт JSON<input id="inputImportJson" type="file" accept=".json" class="hidden" /></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card stack">
+          <div class="row-between">
+            <h2 style="margin:0;font-size:15px;font-weight:800">Збережені проєкти</h2>
+            <span id="savedProjectsCount" class="mono" style="font-size:12px;color:#64748b">0</span>
+          </div>
+          <div id="savedProjectsList" class="scroll-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav no-print">
+    <button data-tab="scan" class="mobile-nav-btn"><span>📷</span><span>Замір</span></button>
+    <button data-tab="blueprint" class="mobile-nav-btn"><span>📐</span><span>Креслення</span></button>
+    <button data-tab="nesting" class="mobile-nav-btn"><span>✂️</span><span>Розкрій</span></button>
+    <button data-tab="projects" class="mobile-nav-btn"><span>📁</span><span>Проєкти</span></button>
+  </nav>
+
+  <!-- Printable A4 Production Sheet (used for instant offline PDF fallback) -->
+  <div id="printSheet"></div>
+
+  <!-- Toasts -->
+  <div id="toastContainer"></div>
+
+  <script>
+    const STORAGE_KEY = 'stonescan_pro_projects_v3';
+
+    function createDefaultProject() {
+      return {
+        id: 'proj_demo_1',
+        updatedAt: new Date().toISOString(),
+        meta: {
+          name: 'ЖК Парус — Кухня + Острів',
+          client: 'Олена Коваленко',
+          measurer: 'Андрій (об\'єкт)',
+          address: 'м. Львів, вул. Липинського 28',
+          decor: 'Calacatta Viola Matt (12 мм)',
+          notes: 'Стики стільниці звести по малюнку прожилок. Острів з барним виступом 300 мм та потовщенням 35 мм.'
+        },
+        countertop: {
+          enabled: true,
+          shape: 'L',
+          segA: { length: 2850, depth: 600, edges: { top: 'raw', bottom: 'miter45', left: 'raw', right: 'raw' } },
+          segB: { length: 1650, depth: 600, edges: { top: 'raw', bottom: 'miter45', left: 'raw', right: 'polish' } },
+          segC: { length: 1400, depth: 600, edges: { top: 'raw', bottom: 'polish', left: 'polish', right: 'raw' } },
+          thickening: 35,
+          cutouts: [
+            { id: 'c_sink_1', type: 'sink', segment: 'A', label: 'Мийка підстільна', model: '', photoDataUrl: '', x: 750, y: 100, w: 500, h: 400, mount: 'підстільна', radius: 10 },
+            { id: 'c_hob_1', type: 'hob', segment: 'A', label: 'Варочна індукція', model: '', photoDataUrl: '', x: 1850, y: 55, w: 560, h: 490, mount: 'врізна', radius: 5 }
+          ]
+        },
+        backsplash: {
+          enabled: true,
+          height: 600,
+          activePanelId: 'A',
+          panels: [
+            { id: 'A', name: 'Стіна A', length: 2850, height: 600, enabled: true, autoAddFrontDepth: false, edges: { top: 'polish', bottom: 'raw', left: 'raw', right: 'miter45' } },
+            { id: 'B', name: 'Стіна B', length: 2250, height: 600, enabled: true, autoAddFrontDepth: true, edges: { top: 'polish', bottom: 'raw', left: 'miter45', right: 'polish' } }
+          ],
+          outlets: [
+            { id: 'out_1', panel: 'A', label: 'Блок біля мийки', x: 380, y: 150, gangs: 3, diam: 68 },
+            { id: 'out_2', panel: 'A', label: 'Робоча зона', x: 1450, y: 150, gangs: 4, diam: 68 },
+            { id: 'out_3', panel: 'B', label: 'Кавоварка / Чайник', x: 650, y: 150, gangs: 2, diam: 68 }
+          ]
+        },
+        island: {
+          enabled: true,
+          length: 2100,
+          depth: 950,
+          legsMode: 'left',
+          waterfallLeft: true,
+          waterfallRight: false,
+          waterfallHeight: 880,
+          barOverhangEnabled: true,
+          barOverhangWidth: 300,
+          barOverhangThickening: 35,
+          thickening: 35,
+          edges: { top: 'miter45', bottom: 'miter45', left: 'miter45', right: 'miter45' },
+          cutouts: []
+        },
+        slab: {
+          material: 'Керамограніт великоформатний',
+          preset: '3200x1600',
+          length: 3200,
+          width: 1600,
+          thickness: 12,
+          kerf: 4,
+          trim: 15,
+          orientation: 'optimal'
+        }
+      };
+    }
+
+    function createBlankProject() {
+      const p = createDefaultProject();
+      p.id = 'proj_' + Date.now();
+      p.meta = { name: 'Новий замір ' + new Date().toLocaleDateString('uk-UA'), client: '', measurer: '', address: '', decor: '', notes: '' };
+      p.countertop.shape = 'straight';
+      p.countertop.segA.length = 2400; p.countertop.segA.depth = 600;
+      p.countertop.cutouts = [{ id: 'c_sink_' + Date.now(), type: 'sink', segment: 'A', label: 'Мийка', model: '', photoDataUrl: '', x: 600, y: 100, w: 500, h: 400, mount: 'підстільна', radius: 10 }];
+      p.backsplash.activePanelId = 'A';
+      p.backsplash.panels = [{ id: 'A', name: 'Стіна A', length: 2400, height: 600, enabled: true, autoAddFrontDepth: false, edges: { top: 'polish', bottom: 'raw', left: 'raw', right: 'raw' } }];
+      p.backsplash.outlets = [{ id: 'out_' + Date.now(), panel: 'A', label: 'Розетки робочої зони', x: 1200, y: 150, gangs: 3, diam: 68 }];
+      p.island.enabled = false; p.island.legsMode = 'none'; p.island.waterfallLeft = false; p.island.waterfallRight = false; p.island.barOverhangEnabled = false;
+      return p;
+    }
+
+    function normalizeProject(proj) {
+      if (!proj.backsplash.panels) {
+        const h = Number(proj.backsplash.height) || 600;
+        proj.backsplash.panels = [{ id: 'A', name: 'Стіна A', length: 2400, height: h, enabled: true, autoAddFrontDepth: false, edges: { top: 'polish', bottom: 'raw', left: 'raw', right: 'raw' } }];
+        proj.backsplash.activePanelId = 'A';
+      }
+      if (!proj.backsplash.activePanelId && proj.backsplash.panels.length) proj.backsplash.activePanelId = proj.backsplash.panels[0].id;
+      const isl = proj.island;
+      if (!isl.legsMode) {
+        if (isl.waterfallLeft && isl.waterfallRight) isl.legsMode = 'both';
+        else if (isl.waterfallLeft) isl.legsMode = 'left';
+        else if (isl.waterfallRight) isl.legsMode = 'right';
+        else isl.legsMode = 'none';
+      }
+      if (isl.barOverhangEnabled === undefined) isl.barOverhangEnabled = false;
+      if (isl.barOverhangWidth === undefined) isl.barOverhangWidth = 300;
+      if (isl.barOverhangThickening === undefined) isl.barOverhangThickening = 35;
+      (proj.countertop.cutouts || []).forEach(c => { if (!c.segment) c.segment = 'A'; if (c.model === undefined) c.model = ''; if (c.photoDataUrl === undefined) c.photoDataUrl = ''; });
+      (proj.island.cutouts || []).forEach(c => { if (!c.segment) c.segment = 'island'; if (c.model === undefined) c.model = ''; if (c.photoDataUrl === undefined) c.photoDataUrl = ''; });
+      syncSideBacksplashLengths(proj);
+      return proj;
+    }
+
+    function applyIslandLegsMode(isl, mode) {
+      isl.legsMode = mode;
+      isl.waterfallLeft = (mode === 'left' || mode === 'both');
+      isl.waterfallRight = (mode === 'right' || mode === 'both');
+    }
+
+    function syncSideBacksplashLengths(proj) {
+      if (!proj.backsplash || !Array.isArray(proj.backsplash.panels)) return;
+      const ct = proj.countertop, frontDepth = Number(ct.segA.depth) || 0;
+      proj.backsplash.panels.forEach(pn => {
+        if (!pn.autoAddFrontDepth) return;
+        if (pn.id === 'B' && (ct.shape === 'L' || ct.shape === 'U')) pn.length = (Number(ct.segB.length) || 0) + frontDepth;
+        else if (pn.id === 'C' && ct.shape === 'U') pn.length = (Number(ct.segC.length) || 0) + frontDepth;
+      });
+    }
+
+    function getSegmentLength(proj, zone, segKey) {
+      if (zone === 'island' || segKey === 'island') return Math.max(200, Number(proj.island.length) || 2000);
+      if (segKey === 'B') return Math.max(200, Number(proj.countertop.segB.length) || 1200);
+      if (segKey === 'C') return Math.max(200, Number(proj.countertop.segC.length) || 1200);
+      return Math.max(200, Number(proj.countertop.segA.length) || 2400);
+    }
+
+    function getActiveBacksplashPanel(proj) {
+      const panels = proj.backsplash.panels || [];
+      return panels.find(pn => pn.id === proj.backsplash.activePanelId) || panels[0];
+    }
+
+    function addBacksplashPanel(proj) {
+      const panels = proj.backsplash.panels, letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const used = new Set(panels.map(pn => pn.id));
+      const nextId = letters.find(l => !used.has(l)) || String(panels.length + 1);
+      const frontDepth = Number(proj.countertop.segA.depth) || 0;
+      let suggestedLen = 1400, isSideLinked = false;
+      if (nextId === 'B' && (proj.countertop.shape === 'L' || proj.countertop.shape === 'U')) {
+        suggestedLen = (Number(proj.countertop.segB.length) || 1600) + frontDepth; isSideLinked = true;
+      } else if (nextId === 'C' && proj.countertop.shape === 'U') {
+        suggestedLen = (Number(proj.countertop.segC.length) || 1400) + frontDepth; isSideLinked = true;
+      }
+      panels.push({ id: nextId, name: `Стіна ${nextId}`, length: suggestedLen, height: Number(proj.backsplash.height) || 600, enabled: true, autoAddFrontDepth: isSideLinked, edges: { top: 'polish', bottom: 'raw', left: 'miter45', right: 'polish' } });
+      proj.backsplash.activePanelId = nextId;
+    }
+
+    const appState = {
+      activeTab: 'scan', activeZone: 'countertop', scanTool: 'measure',
+      scanPoints: [], cameraActive: false, cameraStream: null,
+      bpFilter: 'all', bpDark: false,
+      project: createDefaultProject(), savedProjects: [], lastNestingResult: null,
+      workSsdDirHandle: null
+    };
+
+    function loadSavedProjects() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) { appState.savedProjects = parsed.map(normalizeProject); return; }
+        }
+      } catch (e) {}
+      appState.savedProjects = [JSON.parse(JSON.stringify(appState.project))];
+    }
+
+    function persistSavedProjects() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.savedProjects)); } catch (e) {} }
+
+    async function writeProjectToWorkSsdFolder(proj) {
+      if (!appState.workSsdDirHandle) return false;
+      try {
+        const safeName = (proj.meta.name || proj.id || 'project').replace(/[^a-zA-Z0-9а-яА-ЯіІїЇєЄ_-]+/g, '_');
+        const fileHandle = await appState.workSsdDirHandle.getFileHandle(`${safeName}.json`, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(proj, null, 2));
+        await writable.close();
+        return true;
+      } catch (err) { return false; }
+    }
+
+    async function saveCurrentProject(showNotice = true) {
+      appState.project.updatedAt = new Date().toISOString();
+      const clone = JSON.parse(JSON.stringify(appState.project));
+      const idx = appState.savedProjects.findIndex(p => p.id === clone.id);
+      if (idx >= 0) appState.savedProjects[idx] = clone; else appState.savedProjects.unshift(clone);
+      persistSavedProjects(); renderSavedProjectsList();
+      const wroteDisk = await writeProjectToWorkSsdFolder(clone);
+      if (showNotice) showToast(wroteDisk ? 'Проєкт збережено у пам\'ять та на WorkSSD!' : 'Проєкт збережено', 'success');
+    }
+
+    async function pickWorkSsdFolder() {
+      if (!window.showDirectoryPicker) { showToast('У Safari використовуйте «Експорт JSON»; прямий вибір папки працює в Chrome/Edge', 'info'); return; }
+      try {
+        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        appState.workSsdDirHandle = handle;
+        const st = document.getElementById('workSsdFolderStatus');
+        st.textContent = `Папка: ${handle.name}`; st.style.color = '#059669'; st.style.fontWeight = '700';
+        await writeProjectToWorkSsdFolder(appState.project);
+        showToast(`Папку «${handle.name}» підключено!`, 'success');
+      } catch (err) { if (err && err.name !== 'AbortError') showToast('Не вдалося підключити папку', 'error'); }
+    }
+
+    function showToast(message, type = 'info') {
+      const host = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.style.background = type === 'success' ? '#059669' : type === 'error' ? '#e11d48' : '#0f172a';
+      el.textContent = message;
+      host.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-6px)'; setTimeout(() => el.remove(), 260); }, 2600);
+    }
+
+    function buildProductionParts(proj) {
+      const parts = [], edgeLabels = { raw: 'Тех. різ', polish: 'Полір.', miter45: 'Зарізка 45°' };
+      function formatEdges(edges) {
+        const list = [], names = { top: 'Верх', bottom: 'Перед', left: 'Ліво', right: 'Право' };
+        for (const k of ['top', 'bottom', 'left', 'right']) if (edges[k] && edges[k] !== 'raw') list.push(`${names[k]}: ${edgeLabels[edges[k]]}`);
+        return list.length ? list.join(', ') : 'Технічний різ';
+      }
+      function formatCutoutSummary(cuts, segLen) {
+        if (!cuts || !cuts.length) return '—';
+        return cuts.map(c => `${c.label}${c.model ? ` [${c.model}]` : ''} ${c.w}×${c.h} (Л:${c.x} / П:${Math.max(0, segLen - c.x - c.w)})${c.photoDataUrl ? ' 📷' : ''}`).join('; ');
+      }
+
+      if (proj.countertop.enabled) {
+        const ct = proj.countertop, lenA = Math.max(100, Number(ct.segA.length) || 0), cutsA = ct.cutouts.filter(c => (c.segment || 'A') === 'A');
+        parts.push({ code: 'С1', zone: 'countertop', name: 'Стільниця (сегмент A)', length: lenA, width: Math.max(100, Number(ct.segA.depth) || 0), edges: { ...ct.segA.edges }, edgeSummary: formatEdges(ct.segA.edges), cutouts: cutsA, cutoutSummary: formatCutoutSummary(cutsA, lenA), color: '#0284c7' });
+        if (ct.shape === 'L' || ct.shape === 'U') {
+          const lenB = Math.max(100, Number(ct.segB.length) || 0), cutsB = ct.cutouts.filter(c => c.segment === 'B');
+          parts.push({ code: 'С2', zone: 'countertop', name: 'Стільниця (сегмент B)', length: lenB, width: Math.max(100, Number(ct.segB.depth) || 0), edges: { ...ct.segB.edges }, edgeSummary: formatEdges(ct.segB.edges), cutouts: cutsB, cutoutSummary: formatCutoutSummary(cutsB, lenB), color: '#0369a1' });
+        }
+        if (ct.shape === 'U') {
+          const lenC = Math.max(100, Number(ct.segC.length) || 0), cutsC = ct.cutouts.filter(c => c.segment === 'C');
+          parts.push({ code: 'С3', zone: 'countertop', name: 'Стільниця (сегмент C)', length: lenC, width: Math.max(100, Number(ct.segC.depth) || 0), edges: { ...ct.segC.edges }, edgeSummary: formatEdges(ct.segC.edges), cutouts: cutsC, cutoutSummary: formatCutoutSummary(cutsC, lenC), color: '#075985' });
+        }
+        const thick = Number(ct.thickening) || 0;
+        if (thick > 0) {
+          let stripIdx = 1;
+          const segList = [{ s: ct.segA, n: 'A' }];
+          if (ct.shape === 'L' || ct.shape === 'U') segList.push({ s: ct.segB, n: 'B' });
+          if (ct.shape === 'U') segList.push({ s: ct.segC, n: 'C' });
+          const matHint = thick === 40 ? 'кварцит' : 'керамограніт';
+          segList.forEach(({ s, n }) => {
+            if (s.edges.bottom === 'miter45') parts.push({ code: `ПС${stripIdx++}`, zone: 'apron', name: `Підклейка переднього краю ${thick}мм (${matHint}, ${n})`, length: Math.max(100, Number(s.length) || 0), width: thick, edges: { top: 'miter45', bottom: 'polish', left: 'raw', right: 'raw' }, edgeSummary: `Зарізка 45° (${thick} мм)`, cutouts: [], cutoutSummary: '—', color: '#ea580c' });
+          });
+        }
+      }
+
+      if (proj.backsplash.enabled) {
+        const bs = proj.backsplash, bsColors = ['#0d9488', '#0f766e', '#115e59', '#14b8a6', '#0e7490'];
+        (bs.panels || []).forEach((pn, idx) => {
+          if (pn.enabled === false) return;
+          const h = Math.max(100, Number(pn.height || bs.height) || 600), outs = bs.outlets.filter(o => o.panel === pn.id);
+          parts.push({ code: `Ф${idx + 1}`, zone: 'backsplash', name: `Фартух (${pn.name})`, length: Math.max(100, Number(pn.length) || 0), width: h, edges: { ...pn.edges }, edgeSummary: formatEdges(pn.edges), outlets: outs, cutouts: [], cutoutSummary: outs.map(o => `${o.gangs}п Ø${o.diam} (X:${o.x}, Y:${o.y})`).join('; ') || '—', color: bsColors[idx % bsColors.length] });
+        });
+      }
+
+      if (proj.island.enabled) {
+        const isl = proj.island, L = Math.max(200, Number(isl.length) || 0), D = Math.max(200, Number(isl.depth) || 0);
+        const barInfo = isl.barOverhangEnabled ? ` (барний виступ ${isl.barOverhangWidth} мм)` : '';
+        parts.push({ code: 'О1', zone: 'island', name: `Острів — кришка${barInfo}`, length: L, width: D, edges: { ...isl.edges }, edgeSummary: formatEdges(isl.edges), cutouts: isl.cutouts || [], cutoutSummary: formatCutoutSummary(isl.cutouts || [], L), color: '#7c3aed' });
+        const wfH = Math.max(200, Number(isl.waterfallHeight) || 880);
+        if (isl.waterfallLeft) parts.push({ code: 'ОН1', zone: 'island', name: `Острів — Нога ліва (H=${wfH})`, length: D, width: wfH, edges: { top: 'miter45', bottom: 'polish', left: 'miter45', right: 'miter45' }, edgeSummary: 'Верх/боки: Зарізка 45°', cutouts: [], cutoutSummary: '—', color: '#6d28d9' });
+        if (isl.waterfallRight) parts.push({ code: 'ОН2', zone: 'island', name: `Острів — Нога права (H=${wfH})`, length: D, width: wfH, edges: { top: 'miter45', bottom: 'polish', left: 'miter45', right: 'miter45' }, edgeSummary: 'Верх/боки: Зарізка 45°', cutouts: [], cutoutSummary: '—', color: '#6d28d9' });
+        const perimThick = Number(isl.thickening) || 0, barThick = isl.barOverhangEnabled ? (Number(isl.barOverhangThickening) || perimThick) : perimThick;
+        let pIdx = 1;
+        if (barThick > 0 && isl.edges.top === 'miter45') parts.push({ code: `ПО${pIdx++}`, zone: 'apron', name: isl.barOverhangEnabled ? `Потовщення барного виступу ${barThick}мм (керамограніт)` : `Потовщення острова ${barThick}мм (зад)`, length: L, width: barThick, edges: { top: 'miter45', bottom: 'polish', left: 'miter45', right: 'miter45' }, edgeSummary: `Зарізка 45° (${barThick} мм)`, cutouts: [], cutoutSummary: '—', color: '#ea580c' });
+        if (perimThick > 0 && isl.edges.bottom === 'miter45') parts.push({ code: `ПО${pIdx++}`, zone: 'apron', name: `Потовщення острова ${perimThick}мм (перед)`, length: L, width: perimThick, edges: { top: 'miter45', bottom: 'polish', left: 'miter45', right: 'miter45' }, edgeSummary: `Зарізка 45° (${perimThick} мм)`, cutouts: [], cutoutSummary: '—', color: '#ea580c' });
+        if (perimThick > 0 && isl.edges.left === 'miter45' && !isl.waterfallLeft) parts.push({ code: `ПО${pIdx++}`, zone: 'apron', name: `Потовщення острова ${perimThick}мм (ліво)`, length: D, width: perimThick, edges: { top: 'miter45', bottom: 'polish', left: 'miter45', right: 'miter45' }, edgeSummary: `Зарізка 45° (${perimThick} мм)`, cutouts: [], cutoutSummary: '—', color: '#ea580c' });
+        if (perimThick > 0 && isl.edges.right === 'miter45' && !isl.waterfallRight) parts.push({ code: `ПО${pIdx++}`, zone: 'apron', name: `Потовщення острова ${perimThick}мм (право)`, length: D, width: perimThick, edges: { top: 'miter45', bottom: 'polish', left: 'miter45', right: 'miter45' }, edgeSummary: `Зарізка 45° (${perimThick} мм)`, cutouts: [], cutoutSummary: '—', color: '#ea580c' });
+      }
+      return parts;
+    }
+
+    function computeNesting(parts, slabCfg) {
+      const slabL = Math.max(600, Number(slabCfg.length) || 3200), slabW = Math.max(400, Number(slabCfg.width) || 1600);
+      const trim = Math.max(0, Number(slabCfg.trim) || 0), kerf = Math.max(0, Number(slabCfg.kerf) || 4), orient = slabCfg.orientation || 'optimal';
+      const usableL = Math.max(100, slabL - 2 * trim), usableW = Math.max(100, slabW - 2 * trim);
+      const sorted = [...parts].sort((a, b) => (b.length * b.width) - (a.length * a.width));
+      const slabs = [], unplaced = [];
+      function createNewSlab(index) { return { index, slabL, slabW, trim, usableL, usableW, freeRects: [{ x: 0, y: 0, w: usableL, h: usableW }], placed: [] }; }
+      function tryPlaceInSlab(slab, part) {
+        const orientations = [];
+        if (orient === 'horizontal') orientations.push({ w: part.length, h: part.width, rotated: false });
+        else if (orient === 'vertical') orientations.push({ w: part.width, h: part.length, rotated: true });
+        else { orientations.push({ w: part.length, h: part.width, rotated: false }); if (part.length !== part.width) orientations.push({ w: part.width, h: part.length, rotated: true }); }
+        let best = null, bestScore = Infinity;
+        for (let i = 0; i < slab.freeRects.length; i++) {
+          const fr = slab.freeRects[i];
+          for (const o of orientations) {
+            if (o.w <= fr.w && (fr.x + o.w <= slab.usableL) && o.h <= fr.h && (fr.y + o.h <= slab.usableW)) {
+              const score = Math.min(fr.w - o.w, fr.h - o.h) * 10000 + fr.y * 10 + fr.x;
+              if (score < bestScore) { bestScore = score; best = { x: fr.x, y: fr.y, w: o.w, h: o.h, rotated: o.rotated }; }
+            }
+          }
+        }
+        if (!best) return false;
+        slab.placed.push({ ...part, x: best.x + slab.trim, y: best.y + slab.trim, drawW: best.w, drawH: best.h, rotated: best.rotated });
+        const px = best.x, py = best.y, pw = best.w + kerf, ph = best.h + kerf, nextFree = [];
+        for (const fr of slab.freeRects) {
+          if (px >= fr.x + fr.w || px + pw <= fr.x || py >= fr.y + fr.h || py + ph <= fr.y) { nextFree.push(fr); continue; }
+          if (px > fr.x) nextFree.push({ x: fr.x, y: fr.y, w: px - fr.x, h: fr.h });
+          if (px + pw < fr.x + fr.w) nextFree.push({ x: px + pw, y: fr.y, w: (fr.x + fr.w) - (px + pw), h: fr.h });
+          if (py > fr.y) nextFree.push({ x: fr.x, y: fr.y, w: fr.w, h: py - fr.y });
+          if (py + ph < fr.y + fr.h) nextFree.push({ x: fr.x, y: py + ph, w: fr.w, h: (fr.y + fr.h) - (py + ph) });
+        }
+        slab.freeRects = nextFree.filter((r1, i) => {
+          if (r1.w < 20 || r1.h < 20) return false;
+          for (let j = 0; j < nextFree.length; j++) { if (i === j) continue; const r2 = nextFree[j]; if (r1.x >= r2.x && r1.y >= r2.y && r1.x + r1.w <= r2.x + r2.w && r1.y + r1.h <= r2.y + r2.h) return false; }
+          return true;
+        });
+        return true;
+      }
+      for (const part of sorted) {
+        let placed = false;
+        for (const slab of slabs) { if (tryPlaceInSlab(slab, part)) { placed = true; break; } }
+        if (!placed) { const newSlab = createNewSlab(slabs.length + 1); if (tryPlaceInSlab(newSlab, part)) slabs.push(newSlab); else unplaced.push(part); }
+      }
+      const partsAreaMm2 = parts.reduce((sum, p) => sum + p.length * p.width, 0), totalSlabAreaMm2 = slabs.length * slabL * slabW;
+      const utilization = totalSlabAreaMm2 > 0 ? (partsAreaMm2 / totalSlabAreaMm2) * 100 : 0;
+      let totalCutMm = 0, totalMiterMm = 0, totalPolishMm = 0;
+      parts.forEach(p => {
+        totalCutMm += 2 * (p.length + p.width);
+        if (p.edges) {
+          if (p.edges.top === 'miter45') totalMiterMm += p.length; if (p.edges.bottom === 'miter45') totalMiterMm += p.length;
+          if (p.edges.left === 'miter45') totalMiterMm += p.width; if (p.edges.right === 'miter45') totalMiterMm += p.width;
+          if (p.edges.top === 'polish') totalPolishMm += p.length; if (p.edges.bottom === 'polish') totalPolishMm += p.length;
+          if (p.edges.left === 'polish') totalPolishMm += p.width; if (p.edges.right === 'polish') totalPolishMm += p.width;
+        }
+      });
+      return { slabs, unplaced, slabL, slabW, partsAreaM2: partsAreaMm2 / 1e6, totalSlabAreaM2: totalSlabAreaMm2 / 1e6, utilization, waste: totalSlabAreaMm2 > 0 ? Math.max(0, 100 - utilization) : 0, cutMeters: totalCutMm / 1000, miterMeters: totalMiterMm / 1000, polishMeters: totalPolishMm / 1000 };
+    }
+
+    function getZoneBoundingMm() {
+      const p = appState.project;
+      if (appState.activeZone === 'countertop') {
+        const L = Math.max(600, Number(p.countertop.segA.length) || 2400), D = Math.max(400, Number(p.countertop.segA.depth) || 600);
+        return { w: L, h: D + ((p.countertop.shape === 'L' || p.countertop.shape === 'U') ? (Number(p.countertop.segB.length) || 1200) : 0) };
+      }
+      if (appState.activeZone === 'backsplash') {
+        const pn = getActiveBacksplashPanel(p);
+        return { w: Math.max(600, Number(pn ? pn.length : 2400) || 2400), h: Math.max(300, Number(pn ? (pn.height || p.backsplash.height) : p.backsplash.height) || 600) };
+      }
+      return { w: Math.max(600, Number(p.island.length) || 2000), h: Math.max(400, Number(p.island.depth) || 900) };
+    }
+
+    function renderScannerCanvas() {
+      const canvas = document.getElementById('scannerCanvas'), host = document.getElementById('scannerViewport');
+      if (!canvas || !host) return;
+      const rect = host.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+      const cw = Math.max(300, rect.width), ch = Math.max(300, rect.height);
+      canvas.width = cw * dpr; canvas.height = ch * dpr;
+      const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, cw, ch);
+
+      const p = appState.project, padX = 56, padTop = 76, padBottom = 56, bounds = getZoneBoundingMm();
+      const scale = Math.min((cw - padX * 2) / bounds.w, (ch - padTop - padBottom) / bounds.h);
+      const ox = (cw - bounds.w * scale) / 2, oy = padTop + ((ch - padTop - padBottom) - bounds.h * scale) / 2;
+      canvas._transform = { ox, oy, scale };
+
+      function drawEdgeLine(x1, y1, x2, y2, type) {
+        ctx.save(); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+        if (type === 'miter45') { ctx.strokeStyle = '#f97316'; ctx.lineWidth = 4; ctx.setLineDash([8, 4]); }
+        else if (type === 'polish') { ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3.5; }
+        else { ctx.strokeStyle = 'rgba(148,163,184,0.6)'; ctx.lineWidth = 1.5; }
+        ctx.stroke(); ctx.restore();
+      }
+      function drawDimLabel(x, y, text) {
+        ctx.save(); ctx.font = '600 11px ui-monospace, monospace';
+        const tw = ctx.measureText(text).width + 12;
+        ctx.fillStyle = 'rgba(15,23,42,0.88)'; ctx.strokeStyle = 'rgba(56,189,248,0.5)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(x - tw / 2, y - 10, tw, 20, 5); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#e0f2fe'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, x, y); ctx.restore();
+      }
+
+      if (appState.activeZone === 'countertop') {
+        const ct = p.countertop, aW = ct.segA.length * scale, aH = ct.segA.depth * scale;
+        ctx.fillStyle = 'rgba(14,165,233,0.16)'; ctx.fillRect(ox, oy, aW, aH);
+        drawEdgeLine(ox, oy, ox + aW, oy, ct.segA.edges.top); drawEdgeLine(ox, oy + aH, ox + aW, oy + aH, ct.segA.edges.bottom);
+        drawEdgeLine(ox, oy, ox, oy + aH, ct.segA.edges.left); drawEdgeLine(ox + aW, oy, ox + aW, oy + aH, ct.segA.edges.right);
+        drawDimLabel(ox + aW / 2, oy - 16, `${ct.segA.length} мм`); drawDimLabel(ox - 24, oy + aH / 2, `${ct.segA.depth}`);
+        if (ct.shape === 'L' || ct.shape === 'U') {
+          const bW = ct.segB.depth * scale, bH = ct.segB.length * scale, bx = ox + aW - bW, by = oy + aH;
+          ctx.fillStyle = 'rgba(14,165,233,0.12)'; ctx.fillRect(bx, by, bW, bH);
+          drawEdgeLine(bx, by, bx, by + bH, ct.segB.edges.bottom); drawEdgeLine(bx + bW, by, bx + bW, by + bH, ct.segB.edges.top);
+          drawEdgeLine(bx, by + bH, bx + bW, by + bH, ct.segB.edges.right); drawDimLabel(bx + bW + 26, by + bH / 2, `${ct.segB.length}`);
+        }
+        if (ct.shape === 'U') {
+          const cW = ct.segC.depth * scale, cH = ct.segC.length * scale, cx = ox, cy = oy + aH;
+          ctx.fillStyle = 'rgba(14,165,233,0.12)'; ctx.fillRect(cx, cy, cW, cH);
+          drawEdgeLine(cx + cW, cy, cx + cW, cy + cH, ct.segC.edges.bottom); drawEdgeLine(cx, cy + cH, cx + cW, cy + cH, ct.segC.edges.left);
+          drawDimLabel(cx - 24, cy + cH / 2, `${ct.segC.length}`);
+        }
+        ct.cutouts.forEach(c => {
+          const seg = c.segment || 'A'; if (seg === 'B' && ct.shape === 'straight') return; if (seg === 'C' && ct.shape !== 'U') return;
+          let cx, cy, cwMm, chMm;
+          if (seg === 'A') { cx = ox + c.x * scale; cy = oy + c.y * scale; cwMm = c.w * scale; chMm = c.h * scale; }
+          else if (seg === 'B') { const bW = ct.segB.depth * scale, bx = ox + aW - bW, by = oy + aH; cx = bx + bW - (c.y + c.h) * scale; cy = by + c.x * scale; cwMm = c.h * scale; chMm = c.w * scale; }
+          else { cx = ox + c.y * scale; cy = oy + aH + c.x * scale; cwMm = c.h * scale; chMm = c.w * scale; }
+          ctx.save(); ctx.fillStyle = c.type === 'sink' ? 'rgba(56,189,248,0.25)' : 'rgba(244,63,94,0.25)'; ctx.strokeStyle = c.type === 'sink' ? '#38bdf8' : '#fb7185'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.roundRect(cx, cy, cwMm, chMm, 4); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#fff'; ctx.font = '600 10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(c.type === 'sink' ? 'МИЙКА' : 'ВАРОЧНА', cx + cwMm / 2, cy + chMm / 2 - 4);
+          ctx.font = '500 9px ui-monospace, monospace'; ctx.fillText(`${c.w}×${c.h}`, cx + cwMm / 2, cy + chMm / 2 + 8); ctx.restore();
+        });
+      } else if (appState.activeZone === 'backsplash') {
+        const bs = p.backsplash, pn = getActiveBacksplashPanel(p);
+        if (pn) {
+          const pH = Number(pn.height || bs.height) || 600, w = pn.length * scale, h = pH * scale;
+          ctx.fillStyle = 'rgba(20,184,166,0.18)'; ctx.fillRect(ox, oy, w, h);
+          drawEdgeLine(ox, oy, ox + w, oy, pn.edges.top); drawEdgeLine(ox, oy + h, ox + w, oy + h, pn.edges.bottom);
+          drawEdgeLine(ox, oy, ox, oy + h, pn.edges.left); drawEdgeLine(ox + w, oy, ox + w, oy + h, pn.edges.right);
+          drawDimLabel(ox + w / 2, oy - 16, `Фартух (${pn.name}): ${pn.length} мм`); drawDimLabel(ox - 24, oy + h / 2, `${pH}`);
+          bs.outlets.filter(o => o.panel === pn.id).forEach(o => {
+            const cx = ox + o.x * scale, cy = oy + h - o.y * scale, spacing = 71 * scale, r = Math.max(5, (o.diam / 2) * scale), startX = cx - ((o.gangs - 1) * spacing) / 2;
+            ctx.save();
+            for (let i = 0; i < o.gangs; i++) { ctx.beginPath(); ctx.arc(startX + i * spacing, cy, r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(251,191,36,0.35)'; ctx.fill(); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2; ctx.stroke(); }
+            ctx.fillStyle = '#fef3c7'; ctx.font = '600 10px ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.fillText(`⚡${o.gangs}п (X:${o.x}, Y:${o.y})`, cx, cy - r - 8); ctx.restore();
+          });
+        }
+      } else if (appState.activeZone === 'island') {
+        const isl = p.island, w = isl.length * scale, h = isl.depth * scale;
+        ctx.fillStyle = 'rgba(139,92,246,0.18)'; ctx.fillRect(ox, oy, w, h);
+        if (isl.barOverhangEnabled && isl.barOverhangWidth > 0) {
+          const ohPx = Math.min(h * 0.7, isl.barOverhangWidth * scale);
+          ctx.fillStyle = 'rgba(251,191,36,0.22)'; ctx.fillRect(ox, oy, w, ohPx);
+          ctx.save(); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+          ctx.beginPath(); ctx.moveTo(ox, oy + ohPx); ctx.lineTo(ox + w, oy + ohPx); ctx.stroke();
+          ctx.fillStyle = '#fde68a'; ctx.font = '600 10px ui-monospace, monospace'; ctx.textAlign = 'center';
+          ctx.fillText(`БАРНИЙ ВИСТУП: ${isl.barOverhangWidth} мм (потовщ. ${isl.barOverhangThickening || isl.thickening} мм)`, ox + w / 2, oy + ohPx / 2 + 3); ctx.restore();
+        }
+        drawEdgeLine(ox, oy, ox + w, oy, isl.edges.top); drawEdgeLine(ox, oy + h, ox + w, oy + h, isl.edges.bottom);
+        drawEdgeLine(ox, oy, ox, oy + h, isl.edges.left); drawEdgeLine(ox + w, oy, ox + w, oy + h, isl.edges.right);
+        if (isl.waterfallLeft) { ctx.fillStyle = 'rgba(234,88,12,0.55)'; ctx.fillRect(ox - 10, oy, 10, h); }
+        if (isl.waterfallRight) { ctx.fillStyle = 'rgba(234,88,12,0.55)'; ctx.fillRect(ox + w, oy, 10, h); }
+        drawDimLabel(ox + w / 2, oy - 16, `Острів: ${isl.length} мм`); drawDimLabel(ox - 30, oy + h / 2, `${isl.depth}`);
+        const legTxt = isl.legsMode === 'both' ? `2 ноги (H=${isl.waterfallHeight})` : isl.legsMode === 'left' ? `Ліва нога (H=${isl.waterfallHeight})` : isl.legsMode === 'right' ? `Права нога (H=${isl.waterfallHeight})` : 'Лише кришка';
+        ctx.fillStyle = '#e9d5ff'; ctx.font = '600 11px ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.fillText(`${legTxt} • Потовщення: ${isl.thickening || 0} мм`, ox + w / 2, oy + h - 18);
+        (isl.cutouts || []).forEach(c => {
+          const cx = ox + c.x * scale, cy = oy + c.y * scale, cwMm = c.w * scale, chMm = c.h * scale;
+          ctx.save(); ctx.fillStyle = c.type === 'sink' ? 'rgba(56,189,248,0.25)' : 'rgba(244,63,94,0.25)'; ctx.strokeStyle = c.type === 'sink' ? '#38bdf8' : '#fb7185'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.roundRect(cx, cy, cwMm, chMm, 4); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#fff'; ctx.font = '600 10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(c.type === 'sink' ? 'МИЙКА' : 'ВАРОЧНА', cx + cwMm / 2, cy + chMm / 2); ctx.restore();
+        });
+      }
+
+      if (appState.scanPoints.length > 0) {
+        ctx.save(); ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2; ctx.beginPath();
+        appState.scanPoints.forEach((pt, idx) => { const sx = ox + pt.xMm * scale, sy = oy + pt.yMm * scale; if (idx === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy); });
+        ctx.stroke();
+        appState.scanPoints.forEach((pt, idx) => {
+          const sx = ox + pt.xMm * scale, sy = oy + pt.yMm * scale;
+          ctx.beginPath(); ctx.arc(sx, sy, 6, 0, Math.PI * 2); ctx.fillStyle = '#10b981'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+          ctx.fillStyle = '#fff'; ctx.font = '700 10px ui-monospace, monospace'; ctx.textAlign = 'left'; ctx.fillText(`P${idx + 1}`, sx + 9, sy - 6);
+          if (idx > 0) { const prev = appState.scanPoints[idx - 1]; drawDimLabel((sx + ox + prev.xMm * scale) / 2, (sy + oy + prev.yMm * scale) / 2 - 12, `${Math.round(Math.hypot(pt.xMm - prev.xMm, pt.yMm - prev.yMm))} мм`); }
+        });
+        ctx.restore();
+      }
+    }
+
+    function handleScannerClick(e) {
+      const canvas = document.getElementById('scannerCanvas'); if (!canvas || !canvas._transform) return;
+      const rect = canvas.getBoundingClientRect(), px = e.clientX - rect.left, py = e.clientY - rect.top, { ox, oy, scale } = canvas._transform;
+      const xMm = Math.round((px - ox) / scale / 10) * 10, yMm = Math.round((py - oy) / scale / 10) * 10, p = appState.project;
+      if (appState.scanTool === 'measure') {
+        appState.scanPoints.push({ xMm, yMm }); document.getElementById('scanPointCount').textContent = appState.scanPoints.length;
+        if (appState.scanPoints.length >= 2) { const prev = appState.scanPoints[appState.scanPoints.length - 2]; document.getElementById('scanLastDistance').textContent = `${Math.round(Math.hypot(xMm - prev.xMm, yMm - prev.yMm))} мм`; document.getElementById('btnApplyScanPoints').classList.remove('hidden'); }
+        renderScannerCanvas(); return;
+      }
+      if (appState.scanTool === 'sink' || appState.scanTool === 'hob') {
+        if (appState.activeZone === 'backsplash') { showToast('Перейдіть на «Стільниця» або «Острів» для вирізу', 'info'); return; }
+        const isSink = appState.scanTool === 'sink', w = isSink ? 500 : 560, h = isSink ? 400 : 490;
+        const target = appState.activeZone === 'countertop' ? p.countertop : p.island;
+        const maxL = appState.activeZone === 'countertop' ? p.countertop.segA.length : p.island.length;
+        const maxD = appState.activeZone === 'countertop' ? p.countertop.segA.depth : p.island.depth;
+        target.cutouts.push({ id: 'cut_' + Date.now(), type: isSink ? 'sink' : 'hob', segment: appState.activeZone === 'island' ? 'island' : 'A', label: isSink ? 'Мийка підстільна' : 'Варочна поверхня', model: '', photoDataUrl: '', x: Math.round(Math.max(50, Math.min(maxL - w - 50, xMm - w / 2))), y: Math.round(Math.max(40, Math.min(maxD - h - 40, yMm - h / 2))), w, h, mount: isSink ? 'підстільна' : 'врізна', radius: isSink ? 10 : 5 });
+        showToast(isSink ? 'Додано виріз під мийку' : 'Додано виріз під варочну', 'success'); refreshAllViews(); return;
+      }
+      if (appState.scanTool === 'socket') {
+        if (appState.activeZone !== 'backsplash') { appState.activeZone = 'backsplash'; updateZonePills(); }
+        const bs = p.backsplash, pn = getActiveBacksplashPanel(p);
+        const pH = Number(pn ? (pn.height || bs.height) : bs.height) || 600, pL = Number(pn ? pn.length : 2400) || 2400;
+        bs.outlets.push({ id: 'out_' + Date.now(), panel: pn ? pn.id : 'A', label: `Розетка #${bs.outlets.length + 1}`, x: Math.round(Math.max(100, Math.min(pL - 100, xMm))), y: Math.round(Math.max(80, Math.min(pH - 80, pH - yMm))), gangs: 2, diam: 68 });
+        showToast('Додано блок розеток на фартух', 'success'); refreshAllViews();
+      }
+    }
+
+    function applyScanPointsToZone() {
+      if (appState.scanPoints.length < 2) return;
+      const pts = appState.scanPoints, dist1 = Math.max(300, Math.round(Math.hypot(pts[1].xMm - pts[0].xMm, pts[1].yMm - pts[0].yMm) / 10) * 10);
+      const dist2 = pts.length >= 3 ? Math.max(300, Math.round(Math.hypot(pts[2].xMm - pts[1].xMm, pts[2].yMm - pts[1].yMm) / 10) * 10) : null, proj = appState.project;
+      if (appState.activeZone === 'countertop') { proj.countertop.segA.length = dist1; if (dist2) { proj.countertop.segA.depth = Math.min(1200, Math.max(400, dist2)); syncSideBacksplashLengths(proj); } }
+      else if (appState.activeZone === 'backsplash') { const pn = getActiveBacksplashPanel(proj); if (pn) { pn.length = dist1; pn.autoAddFrontDepth = false; if (dist2) { pn.height = Math.min(1200, Math.max(300, dist2)); proj.backsplash.height = pn.height; } } }
+      else if (appState.activeZone === 'island') { proj.island.length = dist1; if (dist2) proj.island.depth = Math.min(1600, Math.max(500, dist2)); }
+      appState.scanPoints = []; document.getElementById('scanPointCount').textContent = '0'; document.getElementById('scanLastDistance').textContent = '— мм';
+      document.getElementById('btnApplyScanPoints').classList.add('hidden');
+      showToast(`Замір застосовано: ${dist1} мм${dist2 ? ' × ' + dist2 + ' мм' : ''}`, 'success'); refreshAllViews();
+    }
+
+    async function toggleCamera() {
+      const video = document.getElementById('cameraVideo'), label = document.getElementById('cameraBtnLabel'), badge = document.getElementById('scanModeBadge');
+      if (appState.cameraActive) {
+        if (appState.cameraStream) { appState.cameraStream.getTracks().forEach(t => t.stop()); appState.cameraStream = null; }
+        video.classList.add('hidden'); appState.cameraActive = false; label.textContent = '📷 Камера AR'; badge.textContent = 'Інтерактивне сканування площини'; return;
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showToast('Камера недоступна — використовуйте сітку сканування', 'info'); return; }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        appState.cameraStream = stream; video.srcObject = stream; video.classList.remove('hidden'); appState.cameraActive = true;
+        label.textContent = 'Вимкнути камеру'; badge.textContent = 'AR Камера активна — ставте точки на площині'; showToast('Камеру увімкнено', 'success');
+      } catch (err) { showToast('Немає доступу до камери — активний режим CAD-сканера', 'info'); }
+    }
+
+    function cycleEdgeType(c) { return c === 'raw' ? 'miter45' : c === 'miter45' ? 'polish' : 'raw'; }
+
+    function edgeButtonHtml(sideKey, sideLabel, currentType, targetAttr) {
+      const cls = currentType === 'miter45' ? 'active-miter' : currentType === 'polish' ? 'active-polish' : '';
+      const txt = currentType === 'miter45' ? '45°' : currentType === 'polish' ? 'Полір.' : 'Різ';
+      return `<button type="button" data-edge-target="${targetAttr}" data-edge-side="${sideKey}" class="edge-btn ${cls}"><span>${sideLabel}</span><strong class="mono">${txt}</strong></button>`;
+    }
+
+    function renderZoneEditor() {
+      const p = appState.project, zone = appState.activeZone;
+      const titleEl = document.getElementById('activeZoneTitle'), chkEl = document.getElementById('chkZoneEnabled');
+      const formEl = document.getElementById('zoneFormContainer'), cutoutsTitle = document.getElementById('cutoutsCardTitle'), quickBtns = document.getElementById('quickAddCutoutBtns');
+
+      if (zone === 'countertop') {
+        titleEl.textContent = 'Параметри стільниці'; chkEl.checked = p.countertop.enabled;
+        const ct = p.countertop;
+        formEl.innerHTML = `
+          <div>
+            <label class="field-label">КОНФІГУРАЦІЯ</label>
+            <div class="grid-3">
+              ${['straight', 'L', 'U'].map(sh => `<button type="button" data-ct-shape="${sh}" class="btn ${ct.shape === sh ? 'btn-sky' : ''}">${sh === 'straight' ? 'Пряма' : sh === 'L' ? 'Г-подібна' : 'П-подібна'}</button>`).join('')}
+            </div>
+          </div>
+          <div class="grid-2">
+            <div><label class="field-label">Сегмент A — Довжина (мм)</label><input data-bind="ct.segA.length" type="number" min="400" max="4200" step="10" value="${ct.segA.length}" class="mono" /></div>
+            <div><label class="field-label">Глибина A (мм)</label><input data-bind="ct.segA.depth" type="number" min="300" max="1200" step="10" value="${ct.segA.depth}" class="mono" /></div>
+          </div>
+          ${(ct.shape === 'L' || ct.shape === 'U') ? `<div class="grid-2">
+            <div><label class="field-label">Сегмент B — Довжина (мм)</label><input data-bind="ct.segB.length" type="number" min="400" max="3200" step="10" value="${ct.segB.length}" class="mono" /></div>
+            <div><label class="field-label">Глибина B (мм)</label><input data-bind="ct.segB.depth" type="number" min="300" max="1200" step="10" value="${ct.segB.depth}" class="mono" /></div>
+          </div>` : ''}
+          ${ct.shape === 'U' ? `<div class="grid-2">
+            <div><label class="field-label">Сегмент C — Довжина (мм)</label><input data-bind="ct.segC.length" type="number" min="400" max="3200" step="10" value="${ct.segC.length}" class="mono" /></div>
+            <div><label class="field-label">Глибина C (мм)</label><input data-bind="ct.segC.depth" type="number" min="300" max="1200" step="10" value="${ct.segC.depth}" class="mono" /></div>
+          </div>` : ''}
+          <div class="box-soft box-orange stack" style="gap:8px">
+            <div class="row-between">
+              <strong style="font-size:11px;color:#9a3412">ПОТОВЩЕННЯ ПЕРЕДНЬОГО КРАЮ (ММ)</strong>
+              <strong class="mono" style="font-size:11px;color:#c2410c">${ct.thickening ? ct.thickening + ' мм' : 'Без'}</strong>
+            </div>
+            <div class="row" style="gap:6px">
+              <span style="font-size:11px;color:#64748b;width:82px">Керамограніт:</span>
+              ${[20, 22, 32, 35].map(v => `<button type="button" data-ct-thick="${v}" class="btn btn-sm mono ${Number(ct.thickening) === v ? 'btn-orange' : ''}">${v} мм</button>`).join('')}
+            </div>
+            <div class="row" style="gap:6px">
+              <span style="font-size:11px;color:#64748b;width:82px">Кварцит:</span>
+              <button type="button" data-ct-thick="40" class="btn btn-sm mono ${Number(ct.thickening) === 40 ? 'btn-orange' : ''}">40 мм (Кварцит)</button>
+              <button type="button" data-ct-thick="0" class="btn btn-sm ${Number(ct.thickening) === 0 ? 'btn-dark' : ''}">Без</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Обробка торців сегмента A (Різ → 45° → Полір.)</label>
+            <div class="grid-2">
+              ${edgeButtonHtml('bottom', 'Передній край', ct.segA.edges.bottom, 'ct.segA')}
+              ${edgeButtonHtml('top', 'Задній (стіна)', ct.segA.edges.top, 'ct.segA')}
+              ${edgeButtonHtml('left', 'Лівий торець', ct.segA.edges.left, 'ct.segA')}
+              ${edgeButtonHtml('right', 'Правий торець', ct.segA.edges.right, 'ct.segA')}
+            </div>
+          </div>`;
+        cutoutsTitle.textContent = 'Вирізи стільниці (мийка / варочна)';
+        quickBtns.innerHTML = `<button type="button" data-quick-add="sink" class="btn btn-sm" style="background:#f0f9ff;color:#0369a1;border-color:#bae6fd">+ Мийка</button><button type="button" data-quick-add="hob" class="btn btn-sm" style="background:#fff1f2;color:#be123c;border-color:#fecdd3">+ Варочна</button>`;
+
+      } else if (zone === 'backsplash') {
+        titleEl.textContent = 'Параметри робочого фартуха'; chkEl.checked = p.backsplash.enabled;
+        const bs = p.backsplash, activePn = getActiveBacksplashPanel(p);
+        const shapeLabel = p.countertop.shape === 'U' ? 'П-подібна' : p.countertop.shape === 'L' ? 'Г-подібна' : 'Пряма';
+        const isSidePanel = activePn && ((activePn.id === 'B' && (p.countertop.shape === 'L' || p.countertop.shape === 'U')) || (activePn.id === 'C' && p.countertop.shape === 'U'));
+        formEl.innerHTML = `
+          <div class="stack" style="gap:8px">
+            <div class="row-between">
+              <label class="field-label" style="margin:0">ЧАСТИНИ ФАРТУХА (${shapeLabel})</label>
+              <button type="button" id="btnAddBacksplashPanel" class="btn btn-sm btn-teal">+ Додати фартух</button>
+            </div>
+            <div class="row" style="gap:6px">
+              ${bs.panels.map(pn => {
+                const isAct = activePn && pn.id === activePn.id;
+                return `<div style="display:inline-flex;border-radius:10px;overflow:hidden;border:1px solid ${isAct ? '#0d9488' : '#cbd5e1'};background:${isAct ? '#f0fdfa' : '#f8fafc'}">
+                  <button type="button" data-select-bspanel="${pn.id}" style="border:none;background:transparent;padding:6px 10px;font-size:12px;font-weight:700;color:${isAct ? '#115e59' : '#334155'}">${pn.name} (${pn.length}мм)</button>
+                  ${bs.panels.length > 1 ? `<button type="button" data-del-bspanel="${pn.id}" style="border:none;background:transparent;padding:6px 8px;color:#e11d48;font-weight:800">×</button>` : ''}
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+          ${activePn ? `<div class="box-soft box-teal stack" style="gap:10px">
+            <div class="row-between">
+              <strong style="font-size:12px;color:#115e59">Редагування: ${activePn.name}</strong>
+              ${isSidePanel ? `<label style="font-size:11px;font-weight:600;color:#115e59;display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input id="chkBsAutoFrontDepth" type="checkbox" ${activePn.autoAddFrontDepth ? 'checked' : ''} /> + глибина передньої (${p.countertop.segA.depth} мм)</label>` : ''}
+            </div>
+            ${activePn.autoAddFrontDepth && isSidePanel ? `<div class="mono" style="font-size:11px;color:#115e59;background:#ccfbf1;border:1px solid #99f6e4;border-radius:8px;padding:6px 8px">Бічний фартух: ${activePn.id === 'B' ? p.countertop.segB.length : p.countertop.segC.length} (бічна) + ${p.countertop.segA.depth} (передня) = <strong>${activePn.length} мм</strong></div>` : ''}
+            <div class="grid-2">
+              <div><label class="field-label">Довжина (${activePn.name}, мм)</label><input data-bspanel-field="length" type="number" min="200" max="4200" step="10" value="${activePn.length}" class="mono" /></div>
+              <div><label class="field-label">Висота (${activePn.name}, мм)</label><input data-bspanel-field="height" type="number" min="100" max="1500" step="10" value="${activePn.height || bs.height}" class="mono" /></div>
+            </div>
+            <div>
+              <label class="field-label">Торці ${activePn.name} (кутовий стик 45° / полір.)</label>
+              <div class="grid-2">
+                ${edgeButtonHtml('top', 'Верхній край', activePn.edges.top, 'bs.active')}
+                ${edgeButtonHtml('bottom', 'Нижній (до стільниці)', activePn.edges.bottom, 'bs.active')}
+                ${edgeButtonHtml('left', 'Лівий край', activePn.edges.left, 'bs.active')}
+                ${edgeButtonHtml('right', 'Правий край', activePn.edges.right, 'bs.active')}
+              </div>
+            </div>
+          </div>` : ''}`;
+        cutoutsTitle.textContent = 'Розетки на фартусі (Ø68 мм)';
+        quickBtns.innerHTML = `<button type="button" data-quick-add="socket" class="btn btn-sm" style="background:#fffbeb;color:#92400e;border-color:#fde68a">+ Розетка</button>`;
+
+      } else if (zone === 'island') {
+        titleEl.textContent = 'Параметри кухонного острова'; chkEl.checked = p.island.enabled;
+        const isl = p.island, legsOptions = [{ id: 'none', label: 'Лише кришка' }, { id: 'left', label: 'Ліва нога' }, { id: 'right', label: 'Права нога' }, { id: 'both', label: 'Обидві ноги' }];
+        formEl.innerHTML = `
+          <div class="grid-2">
+            <div><label class="field-label">Довжина острова (мм)</label><input data-bind="isl.length" type="number" min="600" max="4200" step="10" value="${isl.length}" class="mono" /></div>
+            <div><label class="field-label">Загальна ширина (мм)</label><input data-bind="isl.depth" type="number" min="500" max="1800" step="10" value="${isl.depth}" class="mono" /></div>
+          </div>
+          <div class="box-soft box-violet stack" style="gap:8px">
+            <strong style="font-size:11px;color:#5b21b6">КОНСТРУКЦІЯ ОСТРОВА (КРИШКА / НОГИ ПІД 45°)</strong>
+            <div class="grid-2">
+              ${legsOptions.map(opt => `<button type="button" data-isl-legs="${opt.id}" class="btn btn-sm ${isl.legsMode === opt.id ? 'btn-violet' : ''}">${opt.label}</button>`).join('')}
+            </div>
+            ${isl.legsMode !== 'none' ? `<div><label class="field-label">Висота ніг (мм)</label><input data-bind="isl.waterfallHeight" type="number" min="500" max="1200" step="10" value="${isl.waterfallHeight}" class="mono" /></div>` : ''}
+          </div>
+          <div class="box-soft box-amber stack" style="gap:8px">
+            <label style="font-size:12px;font-weight:700;color:#78350f;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+              <input id="chkBarOverhang" type="checkbox" ${isl.barOverhangEnabled ? 'checked' : ''} /> Острів як барна стійка (виступ кришки)
+            </label>
+            ${isl.barOverhangEnabled ? `
+              <div class="grid-2">
+                <div><label class="field-label">Ширина виступу (мм)</label><input data-bind="isl.barOverhangWidth" type="number" min="100" max="600" step="10" value="${isl.barOverhangWidth}" class="mono" /></div>
+                <div><label class="field-label">База тумб (мм)</label><div class="mono" style="padding:7px 10px;border-radius:10px;border:1px solid #fde68a;background:#fff;font-size:13px;font-weight:700">${Math.max(0, isl.depth - isl.barOverhangWidth)}</div></div>
+              </div>
+              <div>
+                <label class="field-label">Потовщення виступу (керамограніт, мм)</label>
+                <div class="row" style="gap:5px">
+                  ${[0, 25, 35, 40, 60].map(v => `<button type="button" data-bar-thick="${v}" class="btn btn-sm mono ${Number(isl.barOverhangThickening) === v ? 'btn-orange' : ''}">${v === 0 ? 'Без' : v + ' мм'}</button>`).join('')}
+                </div>
+              </div>` : ''}
+          </div>
+          <div>
+            <label class="field-label">Потовщення торця по периметру під 45° (мм)</label>
+            <div class="row" style="gap:5px">
+              ${[0, 25, 35, 40, 60, 80].map(v => `<button type="button" data-isl-thick="${v}" class="btn btn-sm mono ${Number(isl.thickening) === v ? 'btn-orange' : ''}">${v === 0 ? 'Без' : v}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Зарізка 45° / Полірування по периметру острова</label>
+            <div class="grid-2">
+              ${edgeButtonHtml('bottom', 'Передній торець', isl.edges.bottom, 'isl')}
+              ${edgeButtonHtml('top', isl.barOverhangEnabled ? 'Барний виступ' : 'Задній торець', isl.edges.top, 'isl')}
+              ${edgeButtonHtml('left', 'Лівий торець', isl.edges.left, 'isl')}
+              ${edgeButtonHtml('right', 'Правий торець', isl.edges.right, 'isl')}
+            </div>
+          </div>`;
+        cutoutsTitle.textContent = 'Вирізи на острові';
+        quickBtns.innerHTML = `<button type="button" data-quick-add="sink" class="btn btn-sm" style="background:#f0f9ff;color:#0369a1;border-color:#bae6fd">+ Мийка</button><button type="button" data-quick-add="hob" class="btn btn-sm" style="background:#fff1f2;color:#be123c;border-color:#fecdd3">+ Варочна</button>`;
+      }
+      renderCutoutsList();
+    }
+
+    function renderCutoutsList() {
+      const container = document.getElementById('cutoutsListContainer'), p = appState.project, zone = appState.activeZone;
+      if (zone === 'backsplash') {
+        const list = p.backsplash.outlets;
+        if (!list.length) { container.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;padding:14px">Немає розеток.</div>'; return; }
+        container.innerHTML = list.map((o, idx) => `
+          <div class="box-soft box-amber stack" style="gap:8px">
+            <div class="row-between"><strong style="font-size:12px;color:#78350f">⚡ ${o.label} (Стіна ${o.panel})</strong><button type="button" data-del-outlet="${idx}" style="border:none;background:transparent;color:#e11d48;font-size:11px;font-weight:700">Видалити</button></div>
+            <div class="grid-4">
+              <div><label class="field-label">Постів</label><input data-out-idx="${idx}" data-out-field="gangs" type="number" min="1" max="5" value="${o.gangs}" class="mono" /></div>
+              <div><label class="field-label">X (мм)</label><input data-out-idx="${idx}" data-out-field="x" type="number" min="50" max="4000" step="10" value="${o.x}" class="mono" /></div>
+              <div><label class="field-label">Y (мм)</label><input data-out-idx="${idx}" data-out-field="y" type="number" min="50" max="1000" step="10" value="${o.y}" class="mono" /></div>
+              <div><label class="field-label">Стіна</label><select data-out-idx="${idx}" data-out-field="panel">${(p.backsplash.panels || []).map(pn => `<option value="${pn.id}" ${o.panel === pn.id ? 'selected' : ''}>${pn.name}</option>`).join('')}</select></div>
+            </div>
+          </div>`).join('');
+        return;
+      }
+
+      const list = zone === 'countertop' ? p.countertop.cutouts : p.island.cutouts;
+      if (!list.length) { container.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;padding:14px">Немає вирізів. Натисніть «+ Мийка» або «+ Варочна».</div>'; return; }
+      const ctShape = p.countertop.shape;
+      const segOptions = zone === 'island' ? [{ v: 'island', l: 'Кухонний острів' }] : [{ v: 'A', l: `Сегмент A (${p.countertop.segA.length} мм)` }, ...(ctShape === 'L' || ctShape === 'U' ? [{ v: 'B', l: `Сегмент B (${p.countertop.segB.length} мм)` }] : []), ...(ctShape === 'U' ? [{ v: 'C', l: `Сегмент C (${p.countertop.segC.length} мм)` }] : [])];
+
+      container.innerHTML = list.map((c, idx) => {
+        const segKey = zone === 'island' ? 'island' : (c.segment || 'A'), segLen = getSegmentLength(p, zone, segKey);
+        const rightOff = Math.max(0, Math.round(segLen - (Number(c.x) || 0) - (Number(c.w) || 0)));
+        const overflow = (Number(c.x) || 0) + (Number(c.w) || 0) > segLen;
+        return `
+        <div class="box-soft ${c.type === 'sink' ? 'box-sky' : 'box-rose'} stack" style="gap:8px">
+          <div class="row-between"><strong style="font-size:12px">${c.type === 'sink' ? '💧' : '🔥'} ${c.label}</strong><button type="button" data-del-cutout="${idx}" style="border:none;background:transparent;color:#e11d48;font-size:11px;font-weight:700">Видалити</button></div>
+          <div class="grid-2">
+            <div><label class="field-label">Де розташована</label><select data-cut-idx="${idx}" data-cut-field="segment">${segOptions.map(opt => `<option value="${opt.v}" ${segKey === opt.v ? 'selected' : ''}>${opt.l}</option>`).join('')}</select></div>
+            <div><label class="field-label">Модель (опційно)</label><input data-cut-idx="${idx}" data-cut-field="model" type="text" placeholder="Franke / Bosch" value="${(c.model || '').replace(/"/g, '&quot;')}" /></div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#64748b;margin-bottom:4px">ВІДСТУПИ З ДВОХ КРАЇВ ДО ПОЧАТКУ ВИРІЗУ (ММ)</div>
+            <div class="grid-2">
+              <div><label class="field-label">Зліва до початку</label><input data-cut-idx="${idx}" data-cut-field="x" type="number" min="0" max="${segLen}" step="5" value="${c.x}" class="mono" /></div>
+              <div><label class="field-label">Справа до початку</label><input data-cut-idx="${idx}" data-cut-field="rightOff" type="number" min="0" max="${segLen}" step="5" value="${rightOff}" class="mono" /></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#64748b;margin-bottom:4px">ОКРЕМО РОЗМІРИ ${c.type === 'sink' ? 'МИЙКИ' : 'ВАРОЧНОЇ'} ТА ВІДСТУП ВІД СТІНИ (ММ)</div>
+            <div class="grid-3">
+              <div><label class="field-label">Ширина W</label><input data-cut-idx="${idx}" data-cut-field="w" type="number" min="150" max="1400" step="5" value="${c.w}" class="mono" /></div>
+              <div><label class="field-label">Глибина H</label><input data-cut-idx="${idx}" data-cut-field="h" type="number" min="150" max="900" step="5" value="${c.h}" class="mono" /></div>
+              <div><label class="field-label">Від стіни Y</label><input data-cut-idx="${idx}" data-cut-field="y" type="number" min="20" max="1000" step="5" value="${c.y}" class="mono" /></div>
+            </div>
+          </div>
+          ${overflow ? `<div style="font-size:11px;font-weight:700;color:#be123c;background:#ffe4e6;border-radius:8px;padding:5px 8px">Увага: сума зліва + ширина перевищує довжину сегмента (${segLen} мм).</div>` : ''}
+          <div class="row-between" style="padding-top:6px;border-top:1px solid rgba(148,163,184,0.25)">
+            <label class="btn btn-sm" style="background:#fff;cursor:pointer">📷 ${c.photoDataUrl ? 'Змінити фото моделі' : 'Прикріпити фото моделі'}<input type="file" accept="image/*" data-cut-photo="${idx}" class="hidden" /></label>
+            ${c.photoDataUrl ? `<div class="row" style="gap:6px"><img src="${c.photoDataUrl}" alt="Фото" style="width:40px;height:40px;object-fit:cover;border-radius:8px;border:1px solid #cbd5e1" /><button type="button" data-del-cut-photo="${idx}" style="border:none;background:transparent;color:#e11d48;font-size:11px;font-weight:700">Прибрати</button></div>` : '<span style="font-size:10px;color:#94a3b8">Фото не додано</span>'}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderBlueprintView() {
+      const p = appState.project, filter = appState.bpFilter, dark = appState.bpDark;
+      const wrap = document.getElementById('blueprintCanvasWrapper');
+      wrap.className = dark ? 'bp-wrap dark' : 'bp-wrap';
+      document.getElementById('bpThemeLabel').textContent = dark ? 'Темний Blueprint' : 'Світлий CAD';
+      const strokeMain = dark ? '#e2e8f0' : '#0f172a', fillPanel = dark ? 'rgba(56,189,248,0.14)' : 'rgba(241,245,249,0.9)', textMain = dark ? '#f8fafc' : '#0f172a', textDim = dark ? '#38bdf8' : '#0369a1', dimLine = dark ? '#38bdf8' : '#64748b';
+      const svgW = 860; let cursorY = 40; const fragments = [];
+
+      function edgeStrokeSvg(x1, y1, x2, y2, type) {
+        if (type === 'miter45') { const mx = (x1 + x2) / 2, my = (y1 + y2) / 2; return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#ea580c" stroke-width="3.5" stroke-dasharray="7 3" /><rect x="${mx - 15}" y="${my - 8}" width="30" height="16" rx="4" fill="#ea580c" /><text x="${mx}" y="${my + 3.5}" fill="#ffffff" font-size="9" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">45°</text>`; }
+        if (type === 'polish') return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0284c7" stroke-width="3" />`;
+        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${strokeMain}" stroke-width="1.2" />`;
+      }
+      function dimHorizontal(x1, x2, y, label) { return `<g><line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${dimLine}" stroke-width="1" /><line x1="${x1}" y1="${y - 5}" x2="${x1}" y2="${y + 5}" stroke="${dimLine}" stroke-width="1" /><line x1="${x2}" y1="${y - 5}" x2="${x2}" y2="${y + 5}" stroke="${dimLine}" stroke-width="1" /><text x="${(x1 + x2) / 2}" y="${y - 5}" fill="${textDim}" font-size="11" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">${label}</text></g>`; }
+      function dimVertical(x, y1, y2, label) { return `<g><line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${dimLine}" stroke-width="1" /><line x1="${x - 5}" y1="${y1}" x2="${x + 5}" y2="${y1}" stroke="${dimLine}" stroke-width="1" /><line x1="${x - 5}" y1="${y2}" x2="${x + 5}" y2="${y2}" stroke="${dimLine}" stroke-width="1" /><text x="${x - 8}" y="${(y1 + y2) / 2 + 3}" fill="${textDim}" font-size="11" font-weight="700" font-family="ui-monospace, monospace" text-anchor="end">${label}</text></g>`; }
+
+      if ((filter === 'all' || filter === 'countertop') && p.countertop.enabled) {
+        const ct = p.countertop, sc = Math.min(680 / Math.max(1000, ct.segA.length), 0.22), ox = 95, oy = cursorY + 36, aW = ct.segA.length * sc, aH = ct.segA.depth * sc;
+        fragments.push(`<text x="24" y="${cursorY + 6}" fill="${textMain}" font-size="14" font-weight="800">1. СТІЛЬНИЦЯ (${ct.shape === 'straight' ? 'Пряма' : ct.shape === 'L' ? 'Г-подібна' : 'П-подібна'}${ct.thickening > 0 ? `, потовщення ${ct.thickening} мм` : ''})</text>`);
+        fragments.push(`<rect x="${ox}" y="${oy}" width="${aW}" height="${aH}" fill="${fillPanel}" />`);
+        fragments.push(edgeStrokeSvg(ox, oy, ox + aW, oy, ct.segA.edges.top), edgeStrokeSvg(ox, oy + aH, ox + aW, oy + aH, ct.segA.edges.bottom), edgeStrokeSvg(ox, oy, ox, oy + aH, ct.segA.edges.left), edgeStrokeSvg(ox + aW, oy, ox + aW, oy + aH, ct.segA.edges.right));
+        fragments.push(dimHorizontal(ox, ox + aW, oy - 14, `${ct.segA.length} мм`), dimVertical(ox - 14, oy, oy + aH, `${ct.segA.depth}`));
+        let bottomMost = oy + aH;
+        if (ct.shape === 'L' || ct.shape === 'U') {
+          const bW = ct.segB.depth * sc, bH = ct.segB.length * sc, bx = ox + aW - bW, by = oy + aH;
+          fragments.push(`<rect x="${bx}" y="${by}" width="${bW}" height="${bH}" fill="${fillPanel}" />`);
+          fragments.push(edgeStrokeSvg(bx, by, bx, by + bH, ct.segB.edges.bottom), edgeStrokeSvg(bx + bW, by, bx + bW, by + bH, ct.segB.edges.top), edgeStrokeSvg(bx, by + bH, bx + bW, by + bH, ct.segB.edges.right));
+          fragments.push(`<text x="${bx + bW + 10}" y="${by + bH / 2}" fill="${textDim}" font-size="11" font-weight="700" font-family="ui-monospace, monospace">${ct.segB.length} мм</text>`, dimHorizontal(bx, bx + bW, by + bH + 18, `${ct.segB.depth}`));
+          bottomMost = Math.max(bottomMost, by + bH + 26);
+        }
+        if (ct.shape === 'U') {
+          const cW = ct.segC.depth * sc, cH = ct.segC.length * sc, cx = ox, cy = oy + aH;
+          fragments.push(`<rect x="${cx}" y="${cy}" width="${cW}" height="${cH}" fill="${fillPanel}" />`);
+          fragments.push(edgeStrokeSvg(cx + cW, cy, cx + cW, cy + cH, ct.segC.edges.bottom), edgeStrokeSvg(cx, cy + cH, cx + cW, cy + cH, ct.segC.edges.left), dimVertical(cx - 14, cy, cy + cH, `${ct.segC.length}`));
+          bottomMost = Math.max(bottomMost, cy + cH + 26);
+        }
+        ct.cutouts.forEach(c => {
+          const seg = c.segment || 'A'; if (seg === 'B' && ct.shape === 'straight') return; if (seg === 'C' && ct.shape !== 'U') return;
+          const segLen = getSegmentLength(p, 'countertop', seg), rightOff = Math.max(0, Math.round(segLen - c.x - c.w)), clr = c.type === 'sink' ? '#0284c7' : '#e11d48', fillC = c.type === 'sink' ? 'rgba(2,132,199,0.18)' : 'rgba(225,29,72,0.16)';
+          if (seg === 'A') {
+            const cx = ox + c.x * sc, cy = oy + c.y * sc, cw = c.w * sc, ch = c.h * sc;
+            fragments.push(`<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="3" fill="${fillC}" stroke="${clr}" stroke-width="1.8" /><line x1="${ox}" y1="${cy + ch / 2}" x2="${cx}" y2="${cy + ch / 2}" stroke="${clr}" stroke-dasharray="3 2" stroke-width="0.9" /><line x1="${cx + cw}" y1="${cy + ch / 2}" x2="${ox + aW}" y2="${cy + ch / 2}" stroke="${clr}" stroke-dasharray="3 2" stroke-width="0.9" /><text x="${cx + cw / 2}" y="${cy + ch / 2 - 4}" fill="${textMain}" font-size="9" font-weight="700" text-anchor="middle">${c.type === 'sink' ? 'МИЙКА' : 'ВАРОЧНА'}</text><text x="${cx + cw / 2}" y="${cy + ch / 2 + 7}" fill="${clr}" font-size="8.5" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">${c.w}×${c.h}</text><text x="${cx + cw / 2}" y="${cy + ch + 11}" fill="${clr}" font-size="8" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">Л:${c.x} | П:${rightOff}</text>`);
+          } else if (seg === 'B') {
+            const bW = ct.segB.depth * sc, bx = ox + aW - bW, by = oy + aH, cx = bx + bW - (c.y + c.h) * sc, cy = by + c.x * sc, cw = c.h * sc, ch = c.w * sc;
+            fragments.push(`<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="3" fill="${fillC}" stroke="${clr}" stroke-width="1.8" /><text x="${cx + cw / 2}" y="${cy + ch / 2 - 3}" fill="${textMain}" font-size="8.5" font-weight="700" text-anchor="middle">${c.type === 'sink' ? 'МИЙКА' : 'ВАРОЧНА'}</text><text x="${cx + cw / 2}" y="${cy + ch / 2 + 8}" fill="${clr}" font-size="8" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">${c.w}×${c.h} (Л:${c.x}/П:${rightOff})</text>`);
+          } else if (seg === 'C') {
+            const cx = ox + c.y * sc, cy = oy + aH + c.x * sc, cw = c.h * sc, ch = c.w * sc;
+            fragments.push(`<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="3" fill="${fillC}" stroke="${clr}" stroke-width="1.8" /><text x="${cx + cw / 2}" y="${cy + ch / 2 - 3}" fill="${textMain}" font-size="8.5" font-weight="700" text-anchor="middle">${c.type === 'sink' ? 'МИЙКА' : 'ВАРОЧНА'}</text><text x="${cx + cw / 2}" y="${cy + ch / 2 + 8}" fill="${clr}" font-size="8" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">${c.w}×${c.h} (Л:${c.x}/П:${rightOff})</text>`);
+          }
+        });
+        cursorY = bottomMost + 46;
+      }
+
+      if ((filter === 'all' || filter === 'backsplash') && p.backsplash.enabled) {
+        const bs = p.backsplash, activePanels = (bs.panels || []).filter(pn => pn.enabled !== false);
+        fragments.push(`<text x="24" y="${cursorY + 6}" fill="${textMain}" font-size="14" font-weight="800">2. РОБОЧИЙ ФАРТУХ (${activePanels.length} част.: ${activePanels.map(pn => pn.name).join(' + ')})</text>`);
+        cursorY += 32;
+        activePanels.forEach((pn, pIdx) => {
+          const pH = Number(pn.height || bs.height) || 600, sc = Math.min(680 / Math.max(1000, pn.length), 0.22), ox = 95, oy = cursorY + 18, w = pn.length * sc, h = pH * sc;
+          let bsDimTxt = `Ф${pIdx + 1} (${pn.name}): ${pn.length} мм`;
+          if (pn.autoAddFrontDepth && pn.id === 'B' && (p.countertop.shape === 'L' || p.countertop.shape === 'U')) bsDimTxt = `Ф${pIdx + 1} (${pn.name}): ${p.countertop.segB.length} + ${p.countertop.segA.depth} = ${pn.length} мм`;
+          else if (pn.autoAddFrontDepth && pn.id === 'C' && p.countertop.shape === 'U') bsDimTxt = `Ф${pIdx + 1} (${pn.name}): ${p.countertop.segC.length} + ${p.countertop.segA.depth} = ${pn.length} мм`;
+          fragments.push(`<rect x="${ox}" y="${oy}" width="${w}" height="${h}" fill="${dark ? 'rgba(20,184,166,0.15)' : 'rgba(240,253,250,0.95)'}" />`);
+          fragments.push(edgeStrokeSvg(ox, oy, ox + w, oy, pn.edges.top), edgeStrokeSvg(ox, oy + h, ox + w, oy + h, pn.edges.bottom), edgeStrokeSvg(ox, oy, ox, oy + h, pn.edges.left), edgeStrokeSvg(ox + w, oy, ox + w, oy + h, pn.edges.right));
+          fragments.push(dimHorizontal(ox, ox + w, oy - 12, bsDimTxt), dimVertical(ox - 14, oy, oy + h, `${pH}`));
+          bs.outlets.filter(o => o.panel === pn.id).forEach(o => {
+            const cx = ox + o.x * sc, cy = oy + h - o.y * sc, step = 71 * sc, startX = cx - ((o.gangs - 1) * step) / 2;
+            for (let i = 0; i < o.gangs; i++) fragments.push(`<circle cx="${startX + i * step}" cy="${cy}" r="${Math.max(4.5, 34 * sc)}" fill="rgba(245,158,11,0.28)" stroke="#d97706" stroke-width="1.6" />`);
+            fragments.push(`<line x1="${cx}" y1="${cy + 6}" x2="${cx}" y2="${oy + h}" stroke="#d97706" stroke-dasharray="2 2" stroke-width="1" /><text x="${cx}" y="${cy - 10}" fill="#b45309" font-size="9" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">${o.gangs}п Ø${o.diam} (X:${o.x}, Y:${o.y})</text>`);
+          });
+          cursorY = oy + h + 42;
+        });
+        cursorY += 12;
+      }
+
+      if ((filter === 'all' || filter === 'island') && p.island.enabled) {
+        const isl = p.island, sc = Math.min(460 / Math.max(800, isl.length), 0.22), ox = 95, oy = cursorY + 34, w = isl.length * sc, h = isl.depth * sc;
+        const legsTxt = isl.legsMode === 'both' ? `2 ноги (H=${isl.waterfallHeight})` : isl.legsMode === 'left' ? `Ліва нога (H=${isl.waterfallHeight})` : isl.legsMode === 'right' ? `Права нога (H=${isl.waterfallHeight})` : 'Лише кришка';
+        fragments.push(`<text x="24" y="${cursorY + 6}" fill="${textMain}" font-size="14" font-weight="800">3. КУХОННИЙ ОСТРІВ (${isl.length} × ${isl.depth} мм • ${legsTxt}${isl.barOverhangEnabled ? ` • Барний виступ ${isl.barOverhangWidth} мм` : ''})</text>`);
+        fragments.push(`<rect x="${ox}" y="${oy}" width="${w}" height="${h}" fill="${dark ? 'rgba(139,92,246,0.16)' : 'rgba(245,243,255,0.9)'}" />`);
+        if (isl.barOverhangEnabled && isl.barOverhangWidth > 0) {
+          const ohPx = Math.min(h * 0.7, isl.barOverhangWidth * sc);
+          fragments.push(`<rect x="${ox}" y="${oy}" width="${w}" height="${ohPx}" fill="rgba(245,158,11,0.18)" /><line x1="${ox}" y1="${oy + ohPx}" x2="${ox + w}" y2="${oy + ohPx}" stroke="#d97706" stroke-dasharray="5 3" stroke-width="1.4" /><text x="${ox + w / 2}" y="${oy + ohPx / 2 + 3}" fill="#b45309" font-size="9" font-weight="700" font-family="ui-monospace, monospace" text-anchor="middle">БАРНИЙ ВИСТУП ${isl.barOverhangWidth} мм (потовщ. ${isl.barOverhangThickening || isl.thickening} мм)</text>`);
+        }
+        fragments.push(edgeStrokeSvg(ox, oy, ox + w, oy, isl.edges.top), edgeStrokeSvg(ox, oy + h, ox + w, oy + h, isl.edges.bottom), edgeStrokeSvg(ox, oy, ox, oy + h, isl.edges.left), edgeStrokeSvg(ox + w, oy, ox + w, oy + h, isl.edges.right));
+        fragments.push(dimHorizontal(ox, ox + w, oy - 14, `${isl.length} мм`), dimVertical(ox - 14, oy, oy + h, `${isl.depth}`));
+        if (isl.waterfallLeft) fragments.push(`<rect x="${ox - 12}" y="${oy}" width="10" height="${h}" fill="#ea580c" opacity="0.55" /><text x="${ox - 16}" y="${oy + h + 15}" fill="#ea580c" font-size="9" font-weight="700">Ліва нога H:${isl.waterfallHeight}</text>`);
+        if (isl.waterfallRight) fragments.push(`<rect x="${ox + w + 2}" y="${oy}" width="10" height="${h}" fill="#ea580c" opacity="0.55" /><text x="${ox + w - 45}" y="${oy + h + 15}" fill="#ea580c" font-size="9" font-weight="700">Права нога H:${isl.waterfallHeight}</text>`);
+        const sx = ox + w + 65, sy = oy + 12, shownThick = isl.barOverhangEnabled ? (isl.barOverhangThickening || isl.thickening || p.slab.thickness) : (isl.thickening || p.slab.thickness);
+        fragments.push(`<g><rect x="${sx - 12}" y="${sy - 20}" width="195" height="120" rx="8" fill="${dark ? 'rgba(15,23,42,0.75)' : '#f8fafc'}" stroke="${dimLine}" stroke-width="1" /><text x="${sx}" y="${sy - 4}" fill="${textMain}" font-size="10" font-weight="700">ПЕРЕРІЗ ${isl.barOverhangEnabled ? 'ВИСТУПУ' : 'ТОРЦЯ'} 45°</text><polygon points="${sx + 10},${sy + 18} ${sx + 135},${sy + 18} ${sx + 118},${sy + 34} ${sx + 10},${sy + 34}" fill="#0284c7" opacity="0.35" stroke="#0284c7" stroke-width="1.5" /><polygon points="${sx + 135},${sy + 18} ${sx + 135},${sy + 80} ${sx + 118},${sy + 80} ${sx + 118},${sy + 34}" fill="#ea580c" opacity="0.35" stroke="#ea580c" stroke-width="1.5" /><line x1="${sx + 135}" y1="${sy + 18}" x2="${sx + 118}" y2="${sy + 34}" stroke="#ea580c" stroke-width="2.5" /><text x="${sx + 144}" y="${sy + 54}" fill="#ea580c" font-size="10" font-weight="700" font-family="ui-monospace, monospace">${shownThick}мм</text><text x="${sx + 48}" y="${sy + 30}" fill="${textMain}" font-size="9" font-family="ui-monospace, monospace">t=${p.slab.thickness}мм</text><text x="${sx + 56}" y="${sy + 68}" fill="#ea580c" font-size="9" font-weight="700">Зарізка 45°</text></g>`);
+        cursorY = Math.max(oy + h, sy + 110) + 46;
+      }
+
+      document.getElementById('blueprintSvgHost').innerHTML = `<svg id="mainBlueprintSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgW} ${Math.max(260, cursorY)}" style="width:100%;max-width:860px;height:auto">${fragments.join('')}</svg>`;
+      const parts = buildProductionParts(p);
+      document.getElementById('specPartsCount').textContent = `${parts.length} поз.`;
+      document.getElementById('specTableBody').innerHTML = parts.map(pt => `<tr><td class="mono" style="font-weight:800"><span class="dot" style="background:${pt.color}"></span>${pt.code}</td><td style="font-weight:600">${pt.name}</td><td class="mono" style="font-weight:700">${pt.length} × ${pt.width}</td><td class="mono">${((pt.length * pt.width) / 1e6).toFixed(2)} м²</td><td style="color:${pt.edgeSummary.includes('45°') ? '#c2410c' : '#475569'};font-weight:${pt.edgeSummary.includes('45°') ? '700' : '400'}">${pt.edgeSummary}</td><td>${pt.cutoutSummary}</td></tr>`).join('');
+    }
+
+    function renderNestingView() {
+      const p = appState.project, slab = p.slab;
+      document.getElementById('slabMaterialSelect').value = slab.material;
+      document.getElementById('slabPresetSelect').value = slab.preset;
+      document.getElementById('slabLengthInput').value = slab.length;
+      document.getElementById('slabWidthInput').value = slab.width;
+      document.getElementById('slabThicknessSelect').value = String(slab.thickness);
+      document.getElementById('slabKerfInput').value = slab.kerf;
+      document.getElementById('slabTrimInput').value = slab.trim;
+      document.querySelectorAll('.orient-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.orient === slab.orientation));
+
+      const parts = buildProductionParts(p), res = computeNesting(parts, slab);
+      appState.lastNestingResult = res;
+      document.getElementById('kpiSlabsCount').textContent = res.slabs.length;
+      document.getElementById('kpiSlabDim').textContent = `${res.slabL}×${res.slabW}×${slab.thickness} мм`;
+      document.getElementById('kpiUtilization').textContent = `${res.utilization.toFixed(1)}%`;
+      document.getElementById('kpiWaste').textContent = `Залишок: ${res.waste.toFixed(1)}%`;
+      document.getElementById('kpiPartsArea').textContent = `${res.partsAreaM2.toFixed(2)} м²`;
+      document.getElementById('kpiTotalSlabArea').textContent = `Плит: ${res.totalSlabAreaM2.toFixed(2)} м²`;
+      document.getElementById('kpiCutLength').textContent = `${res.cutMeters.toFixed(1)} м.п.`;
+      document.getElementById('kpiMiterLength').textContent = `${res.miterMeters.toFixed(1)} м.п.`;
+      document.getElementById('kpiPolishLength').textContent = `Полір.: ${res.polishMeters.toFixed(1)} м.п.`;
+      document.getElementById('navStatsSummary').textContent = `${parts.length} дет. • ${res.partsAreaM2.toFixed(2)} м² • ${res.slabs.length} пл.`;
+
+      const warnBox = document.getElementById('nestingWarningBox');
+      if (res.unplaced.length > 0) { warnBox.classList.remove('hidden'); document.getElementById('nestingWarningText').innerHTML = `<strong>Увага! Не поміщаються у формат ${res.slabL}×${res.slabW} мм:</strong> ` + res.unplaced.map(u => `${u.code} (${u.length}×${u.width})`).join(', '); }
+      else warnBox.classList.add('hidden');
+
+      const host = document.getElementById('slabsRenderContainer');
+      if (!res.slabs.length) { host.innerHTML = '<div class="card" style="text-align:center;color:#64748b">Немає деталей для розкрою.</div>'; return; }
+
+      host.innerHTML = res.slabs.map(sl => {
+        const usedArea = sl.placed.reduce((s, it) => s + it.drawW * it.drawH, 0), pct = ((usedArea / (sl.slabL * sl.slabW)) * 100).toFixed(1), vw = 800, sc = vw / sl.slabL, vh = sl.slabW * sc;
+        const placedSvg = sl.placed.map(it => {
+          const x = it.x * sc, y = it.y * sc, w = it.drawW * sc, h = it.drawH * sc, fontSize = Math.min(13, Math.max(8, Math.min(w / 6, h / 2.2)));
+          return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${it.color}" fill-opacity="0.22" stroke="${it.color}" stroke-width="2" />${it.edgeSummary.includes('45°') ? `<rect x="${x + 2}" y="${y + 2}" width="${Math.max(0, w - 4)}" height="${Math.max(0, h - 4)}" fill="none" stroke="#ea580c" stroke-width="1.2" stroke-dasharray="5 3" />` : ''}${h >= 18 ? `<text x="${x + w / 2}" y="${y + h / 2 - (h > 36 ? 4 : -3)}" fill="#0f172a" font-size="${fontSize}" font-weight="800" font-family="ui-monospace, monospace" text-anchor="middle">${it.code}${it.rotated ? ' ↻' : ''}</text>` : ''}${h > 36 ? `<text x="${x + w / 2}" y="${y + h / 2 + 11}" fill="#334155" font-size="${Math.max(8, fontSize - 2)}" font-weight="600" font-family="ui-monospace, monospace" text-anchor="middle">${it.length}×${it.width}</text>` : ''}</g>`;
+        }).join('');
+        return `<div class="card stack" style="gap:10px"><div class="row-between"><div class="row"><span class="mono" style="background:#0f172a;color:#fff;padding:4px 8px;border-radius:7px;font-size:11px;font-weight:800">ПЛИТА №${sl.index}</span><strong style="font-size:13px">${slab.material} • ${sl.slabL}×${sl.slabW}×${slab.thickness} мм</strong></div><div class="mono" style="font-size:12px;color:#059669;font-weight:700">Заповнення: ${pct}% (${sl.placed.length} дет.)</div></div><div style="overflow-x:auto"><svg viewBox="0 0 ${vw} ${vh}" style="width:100%;height:auto;border-radius:10px;border:1px solid #cbd5e1;background:#f1f5f9"><rect x="${sl.trim * sc}" y="${sl.trim * sc}" width="${sl.usableL * sc}" height="${sl.usableW * sc}" fill="#ffffff" stroke="#cbd5e1" stroke-dasharray="4 4" stroke-width="1" />${placedSvg}</svg></div><div class="row" style="gap:6px">${sl.placed.map(it => `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:3px 7px"><span class="dot" style="background:${it.color}"></span><strong class="mono">${it.code}</strong> ${it.name} (${it.length}×${it.width})${it.rotated ? ' <strong style="color:#ea580c">90°</strong>' : ''}</span>`).join('')}</div></div>`;
+      }).join('');
+    }
+
+    function renderProjectsMeta() {
+      const m = appState.project.meta;
+      document.getElementById('headerProjectName').textContent = m.name || 'Без назви';
+      document.getElementById('metaProjectName').value = m.name || '';
+      document.getElementById('metaClient').value = m.client || '';
+      document.getElementById('metaMeasurer').value = m.measurer || '';
+      document.getElementById('metaAddress').value = m.address || '';
+      document.getElementById('metaDecor').value = m.decor || '';
+      document.getElementById('metaNotes').value = m.notes || '';
+    }
+
+    function renderSavedProjectsList() {
+      const host = document.getElementById('savedProjectsList');
+      document.getElementById('savedProjectsCount').textContent = `${appState.savedProjects.length} проєкт(ів)`;
+      if (!appState.savedProjects.length) { host.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;padding:18px">Немає збережених проєктів</div>'; return; }
+      host.innerHTML = appState.savedProjects.map(pr => {
+        const isCurrent = pr.id === appState.project.id;
+        const dt = pr.updatedAt ? new Date(pr.updatedAt).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        return `<div class="box-soft ${isCurrent ? 'box-sky' : ''} row-between"><div style="min-width:0"><div style="font-weight:700;font-size:13px">${pr.meta.name || 'Без назви'} ${isCurrent ? '<span style="font-size:10px;background:#0284c7;color:#fff;padding:2px 6px;border-radius:6px;margin-left:4px">Активний</span>' : ''}</div><div style="font-size:11px;color:#64748b">${pr.meta.address || 'Адреса не вказана'} • ${pr.slab.material} (${pr.slab.thickness} мм)</div><div class="mono" style="font-size:10px;color:#94a3b8">${dt}</div></div><div class="row" style="gap:6px"><button type="button" data-load-proj="${pr.id}" class="btn btn-sm" style="background:#fff">Відкрити</button><button type="button" data-del-proj="${pr.id}" class="btn btn-sm" style="color:#e11d48;background:#fff">✕</button></div></div>`;
+      }).join('');
+    }
+
+    function generateProductionPdf() {
+      const p = appState.project, parts = buildProductionParts(p), nest = computeNesting(parts, p.slab);
+      const bpSvg = document.getElementById('blueprintSvgHost').innerHTML;
+      const slabsHtml = document.getElementById('slabsRenderContainer').innerHTML;
+      const photos = [...(p.countertop.cutouts || []), ...(p.island.cutouts || [])].filter(c => c.photoDataUrl);
+      const orientNames = { horizontal: 'По горизонталі (0°)', vertical: 'По вертикалі (90°)', optimal: 'Оптимально (Авто)' };
+
+      document.getElementById('printSheet').innerHTML = `
+        <div style="padding:18px;font-family:sans-serif;color:#0f172a">
+          <div style="background:#0f172a;color:#fff;padding:14px 18px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:11px;color:#38bdf8;font-weight:700">STONESCAN PRO — ТЗ НА ВИРОБНИЦТВО</div><div style="font-size:20px;font-weight:800;margin-top:2px">${p.meta.name || 'Замір кухні'}</div></div>
+            <div style="text-align:right;font-size:12px"><div>Дата: ${new Date().toLocaleDateString('uk-UA')}</div><div>${p.slab.material} (${p.slab.thickness} мм)</div></div>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div><strong>Клієнт:</strong> ${p.meta.client || '—'}</div><div><strong>Замірник:</strong> ${p.meta.measurer || '—'}</div>
+            <div><strong>Адреса:</strong> ${p.meta.address || '—'}</div><div><strong>Плит:</strong> ${nest.slabs.length} шт (${nest.slabL}×${nest.slabW} мм, викор. ${nest.utilization.toFixed(1)}%)</div>
+            <div><strong>Декор:</strong> ${p.meta.decor || '—'}</div><div><strong>Зарізка 45°:</strong> ${nest.miterMeters.toFixed(1)} м.п. | <strong>Різ:</strong> ${nest.cutMeters.toFixed(1)} м.п.</div>
+          </div>
+          ${p.meta.notes ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;font-size:12px"><strong>Примітки:</strong> ${p.meta.notes}</div>` : ''}
+          <h3 style="margin:14px 0 6px;font-size:14px">1. Специфікація деталей</h3>
+          <table><thead><tr><th>Код</th><th>Елемент</th><th>Розмір (мм)</th><th>Площа</th><th>Торці / 45°</th><th>Вирізи / Отвори</th></tr></thead><tbody>${document.getElementById('specTableBody').innerHTML}</tbody></table>
+          ${photos.length ? `<h3 style="margin:14px 0 6px;font-size:14px">Фото моделей (мийка / варочна)</h3><div style="display:flex;gap:12px;flex-wrap:wrap">${photos.map(c => `<div style="border:1px solid #cbd5e1;border-radius:8px;padding:6px;width:180px;font-size:11px"><img src="${c.photoDataUrl}" style="width:100%;height:100px;object-fit:cover;border-radius:6px" /><div><strong>${c.label}</strong></div><div>${c.model || ''} (${c.w}×${c.h} мм)</div></div>`).join('')}</div>` : ''}
+          <div class="print-page-break"></div>
+          <h3 style="margin:0 0 8px;font-size:14px">2. 2D Робочі креслення (мм)</h3>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;padding:10px">${bpSvg}</div>
+          <div class="print-page-break"></div>
+          <h3 style="margin:0 0 8px;font-size:14px">3. Карти розкрою плит (${orientNames[p.slab.orientation]})</h3>
+          ${slabsHtml}
+        </div>`;
+      window.print();
+    }
+
+    function switchTab(tabId) {
+      appState.activeTab = tabId;
+      document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+      const activePanel = document.getElementById(`tab-${tabId}`);
+      if (activePanel) activePanel.classList.remove('hidden');
+      document.querySelectorAll('.nav-tab-btn, .mobile-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+      refreshAllViews();
+    }
+
+    function updateZonePills() {
+      document.querySelectorAll('.zone-pill').forEach(btn => {
+        const active = btn.dataset.zone === appState.activeZone;
+        btn.className = `zone-pill btn ${active ? 'btn-dark' : ''}`;
+      });
+    }
+
+    function updateScanToolButtons() {
+      const hints = { measure: 'Натисніть на площину, щоб поставити точки заміру (P1 → P2 → P3), потім «Застосувати замір».', sink: 'Торкніться стільниці або острова у місці встановлення мийки.', hob: 'Торкніться стільниці або острова у місці варочної поверхні.', socket: 'Торкніться робочого фартуха у місці встановлення блоку розеток.' };
+      document.getElementById('scannerHintText').textContent = hints[appState.scanTool] || '';
+      document.querySelectorAll('.scan-tool-btn').forEach(btn => {
+        const active = btn.dataset.tool === appState.scanTool;
+        btn.className = `scan-tool-btn btn btn-sm ${active ? 'btn-sky' : 'btn-dark'}`;
+      });
+    }
+
+    function updateBlueprintFilterButtons() {
+      document.querySelectorAll('.bp-filter-btn').forEach(btn => {
+        btn.className = `bp-filter-btn btn btn-sm ${btn.dataset.bp === appState.bpFilter ? 'btn-dark' : ''}`;
+      });
+    }
+
+    function refreshAllViews() {
+      renderProjectsMeta(); updateZonePills(); updateScanToolButtons(); updateBlueprintFilterButtons();
+      renderZoneEditor(); renderScannerCanvas(); renderBlueprintView(); renderNestingView(); renderSavedProjectsList();
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.nav-tab-btn, .mobile-nav-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+      document.querySelectorAll('.zone-pill').forEach(btn => btn.addEventListener('click', () => { appState.activeZone = btn.dataset.zone; appState.scanPoints = []; document.getElementById('scanPointCount').textContent = '0'; document.getElementById('scanLastDistance').textContent = '— мм'; document.getElementById('btnApplyScanPoints').classList.add('hidden'); refreshAllViews(); }));
+      document.querySelectorAll('.scan-tool-btn').forEach(btn => btn.addEventListener('click', () => { appState.scanTool = btn.dataset.tool; updateScanToolButtons(); }));
+      document.getElementById('scannerCanvas').addEventListener('click', handleScannerClick);
+      document.getElementById('btnClearScanPoints').addEventListener('click', () => { appState.scanPoints = []; document.getElementById('scanPointCount').textContent = '0'; document.getElementById('scanLastDistance').textContent = '— мм'; document.getElementById('btnApplyScanPoints').classList.add('hidden'); renderScannerCanvas(); });
+      document.getElementById('btnApplyScanPoints').addEventListener('click', applyScanPointsToZone);
+      document.getElementById('btnToggleCamera').addEventListener('click', toggleCamera);
+      document.getElementById('btnGoToBlueprint').addEventListener('click', () => switchTab('blueprint'));
+      document.getElementById('chkZoneEnabled').addEventListener('change', (e) => { appState.project[appState.activeZone].enabled = e.target.checked; refreshAllViews(); });
+
+      document.getElementById('zoneFormContainer').addEventListener('click', (e) => {
+        const shapeBtn = e.target.closest('[data-ct-shape]'); if (shapeBtn) { appState.project.countertop.shape = shapeBtn.dataset.ctShape; syncSideBacksplashLengths(appState.project); refreshAllViews(); return; }
+        const ctThickBtn = e.target.closest('[data-ct-thick]'); if (ctThickBtn) { appState.project.countertop.thickening = Number(ctThickBtn.dataset.ctThick); refreshAllViews(); return; }
+        const islLegsBtn = e.target.closest('[data-isl-legs]'); if (islLegsBtn) { applyIslandLegsMode(appState.project.island, islLegsBtn.dataset.islLegs); refreshAllViews(); return; }
+        const barThickBtn = e.target.closest('[data-bar-thick]'); if (barThickBtn) { appState.project.island.barOverhangThickening = Number(barThickBtn.dataset.barThick); refreshAllViews(); return; }
+        const islThickBtn = e.target.closest('[data-isl-thick]'); if (islThickBtn) { appState.project.island.thickening = Number(islThickBtn.dataset.islThick); refreshAllViews(); return; }
+        if (e.target.closest('#btnAddBacksplashPanel')) { addBacksplashPanel(appState.project); showToast('Додано нову частину фартуха', 'success'); refreshAllViews(); return; }
+        const selBs = e.target.closest('[data-select-bspanel]'); if (selBs) { appState.project.backsplash.activePanelId = selBs.dataset.selectBspanel; refreshAllViews(); return; }
+        const delBs = e.target.closest('[data-del-bspanel]');
+        if (delBs) { const delId = delBs.dataset.delBspanel, bs = appState.project.backsplash; if (bs.panels.length > 1) { bs.panels = bs.panels.filter(pn => pn.id !== delId); bs.outlets = bs.outlets.filter(o => o.panel !== delId); bs.activePanelId = bs.panels[0].id; showToast(`Видалено фартух ${delId}`, 'info'); refreshAllViews(); } return; }
+        const edgeBtn = e.target.closest('[data-edge-target]');
+        if (edgeBtn) {
+          const target = edgeBtn.dataset.edgeTarget, side = edgeBtn.dataset.edgeSide, p = appState.project;
+          if (target === 'ct.segA') p.countertop.segA.edges[side] = cycleEdgeType(p.countertop.segA.edges[side]);
+          if (target === 'bs.active') { const pn = getActiveBacksplashPanel(p); if (pn) pn.edges[side] = cycleEdgeType(pn.edges[side]); }
+          if (target === 'isl') p.island.edges[side] = cycleEdgeType(p.island.edges[side]);
+          refreshAllViews();
+        }
+      });
+
+      document.getElementById('zoneFormContainer').addEventListener('input', (e) => {
+        const bsInp = e.target.closest('[data-bspanel-field]');
+        if (bsInp) {
+          const pn = getActiveBacksplashPanel(appState.project);
+          if (pn) {
+            const val = Number(bsInp.value) || 0; pn[bsInp.dataset.bspanelField] = val;
+            if (bsInp.dataset.bspanelField === 'length') { pn.autoAddFrontDepth = false; const autoChk = document.getElementById('chkBsAutoFrontDepth'); if (autoChk) autoChk.checked = false; }
+            if (bsInp.dataset.bspanelField === 'height') appState.project.backsplash.height = val;
+            renderScannerCanvas(); renderBlueprintView(); renderNestingView();
+          }
+          return;
+        }
+        const inp = e.target.closest('[data-bind]'); if (!inp) return;
+        const val = Number(inp.value) || 0, path = inp.dataset.bind, p = appState.project;
+        if (path === 'ct.segA.length') p.countertop.segA.length = val;
+        if (path === 'ct.segA.depth') { p.countertop.segA.depth = val; syncSideBacksplashLengths(p); }
+        if (path === 'ct.segB.length') { p.countertop.segB.length = val; syncSideBacksplashLengths(p); }
+        if (path === 'ct.segB.depth') p.countertop.segB.depth = val;
+        if (path === 'ct.segC.length') { p.countertop.segC.length = val; syncSideBacksplashLengths(p); }
+        if (path === 'ct.segC.depth') p.countertop.segC.depth = val;
+        if (path === 'isl.length') p.island.length = val;
+        if (path === 'isl.depth') p.island.depth = val;
+        if (path === 'isl.waterfallHeight') p.island.waterfallHeight = val;
+        if (path === 'isl.barOverhangWidth') p.island.barOverhangWidth = val;
+        renderScannerCanvas(); renderBlueprintView(); renderNestingView();
+      });
+
+      document.getElementById('zoneFormContainer').addEventListener('change', (e) => {
+        if (e.target.id === 'chkBsAutoFrontDepth') { const pn = getActiveBacksplashPanel(appState.project); if (pn) { pn.autoAddFrontDepth = e.target.checked; syncSideBacksplashLengths(appState.project); refreshAllViews(); } }
+        if (e.target.id === 'chkBarOverhang') { appState.project.island.barOverhangEnabled = e.target.checked; refreshAllViews(); }
+      });
+
+      document.getElementById('quickAddCutoutBtns').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-quick-add]'); if (!btn) return;
+        const type = btn.dataset.quickAdd, p = appState.project;
+        if (type === 'socket') { const pn = getActiveBacksplashPanel(p); p.backsplash.outlets.push({ id: 'out_' + Date.now(), panel: pn ? pn.id : 'A', label: `Розетка #${p.backsplash.outlets.length + 1}`, x: 900, y: 150, gangs: 2, diam: 68 }); }
+        else { const target = appState.activeZone === 'countertop' ? p.countertop : p.island; target.cutouts.push({ id: 'cut_' + Date.now(), type, segment: appState.activeZone === 'island' ? 'island' : 'A', label: type === 'sink' ? 'Мийка підстільна' : 'Варочна поверхня', model: '', photoDataUrl: '', x: 600, y: 80, w: type === 'sink' ? 500 : 560, h: type === 'sink' ? 400 : 490, mount: type === 'sink' ? 'підстільна' : 'врізна', radius: type === 'sink' ? 10 : 5 }); }
+        refreshAllViews();
+      });
+
+      document.getElementById('cutoutsListContainer').addEventListener('click', (e) => {
+        const delCut = e.target.closest('[data-del-cutout]'); if (delCut) { const list = appState.activeZone === 'countertop' ? appState.project.countertop.cutouts : appState.project.island.cutouts; list.splice(Number(delCut.dataset.delCutout), 1); refreshAllViews(); return; }
+        const delPhoto = e.target.closest('[data-del-cut-photo]'); if (delPhoto) { const list = appState.activeZone === 'countertop' ? appState.project.countertop.cutouts : appState.project.island.cutouts; if (list[Number(delPhoto.dataset.delCutPhoto)]) { list[Number(delPhoto.dataset.delCutPhoto)].photoDataUrl = ''; refreshAllViews(); } return; }
+        const delOut = e.target.closest('[data-del-outlet]'); if (delOut) { appState.project.backsplash.outlets.splice(Number(delOut.dataset.delOutlet), 1); refreshAllViews(); }
+      });
+
+      document.getElementById('cutoutsListContainer').addEventListener('change', (e) => {
+        const photoInp = e.target.closest('[data-cut-photo]');
+        if (photoInp && photoInp.files && photoInp.files[0]) {
+          const idx = Number(photoInp.dataset.cutPhoto), list = appState.activeZone === 'countertop' ? appState.project.countertop.cutouts : appState.project.island.cutouts;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const sc = Math.min(1, 420 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+              c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc)); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+              if (list[idx]) { list[idx].photoDataUrl = c.toDataURL('image/jpeg', 0.8); showToast('Фото моделі прикріплено', 'success'); refreshAllViews(); }
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(photoInp.files[0]); return;
+        }
+        const cSel = e.target.closest('select[data-cut-idx]');
+        if (cSel) { const idx = Number(cSel.dataset.cutIdx), list = appState.activeZone === 'countertop' ? appState.project.countertop.cutouts : appState.project.island.cutouts; if (list[idx]) { list[idx].segment = cSel.value; const segLen = getSegmentLength(appState.project, appState.activeZone, cSel.value); if (list[idx].x + list[idx].w > segLen) list[idx].x = Math.max(0, Math.round((segLen - list[idx].w) / 2)); refreshAllViews(); } return; }
+        const oSel = e.target.closest('select[data-out-idx]');
+        if (oSel) { const o = appState.project.backsplash.outlets[Number(oSel.dataset.outIdx)]; if (o) { o.panel = oSel.value; refreshAllViews(); } }
+      });
+
+      document.getElementById('cutoutsListContainer').addEventListener('input', (e) => {
+        const cInp = e.target.closest('input[data-cut-idx]');
+        if (cInp) {
+          const idx = Number(cInp.dataset.cutIdx), field = cInp.dataset.cutField, list = appState.activeZone === 'countertop' ? appState.project.countertop.cutouts : appState.project.island.cutouts, cut = list[idx];
+          if (cut) {
+            if (field === 'model') cut.model = cInp.value;
+            else if (field === 'rightOff') { const segLen = getSegmentLength(appState.project, appState.activeZone, cut.segment || 'A'); cut.x = Math.max(0, Math.round(segLen - Math.max(0, Number(cInp.value) || 0) - (Number(cut.w) || 0))); const leftSibling = document.querySelector(`input[data-cut-idx="${idx}"][data-cut-field="x"]`); if (leftSibling) leftSibling.value = cut.x; }
+            else { cut[field] = Number(cInp.value) || 0; if (field === 'x' || field === 'w') { const segLen = getSegmentLength(appState.project, appState.activeZone, cut.segment || 'A'); const rightSibling = document.querySelector(`input[data-cut-idx="${idx}"][data-cut-field="rightOff"]`); if (rightSibling) rightSibling.value = Math.max(0, Math.round(segLen - (Number(cut.x) || 0) - (Number(cut.w) || 0))); } }
+            renderScannerCanvas(); renderBlueprintView(); renderNestingView();
+          }
+          return;
+        }
+        const oInp = e.target.closest('input[data-out-idx]');
+        if (oInp) { const o = appState.project.backsplash.outlets[Number(oInp.dataset.outIdx)]; if (o) { o[oInp.dataset.outField] = Number(oInp.value) || 0; renderScannerCanvas(); renderBlueprintView(); renderNestingView(); } }
+      });
+
+      document.querySelectorAll('.bp-filter-btn').forEach(btn => btn.addEventListener('click', () => { appState.bpFilter = btn.dataset.bp; updateBlueprintFilterButtons(); renderBlueprintView(); }));
+      document.getElementById('btnBlueprintTheme').addEventListener('click', () => { appState.bpDark = !appState.bpDark; renderBlueprintView(); });
+      document.getElementById('btnRunNestingFromBp').addEventListener('click', () => { switchTab('nesting'); showToast('Розкрій плити виконано!', 'success'); });
+      document.getElementById('slabMaterialSelect').addEventListener('change', (e) => { appState.project.slab.material = e.target.value; renderNestingView(); });
+      document.getElementById('slabPresetSelect').addEventListener('change', (e) => { const val = e.target.value; appState.project.slab.preset = val; if (val !== 'custom') { const [l, w] = val.split('x').map(Number); appState.project.slab.length = l; appState.project.slab.width = w; } renderNestingView(); });
+      ['slabLengthInput', 'slabWidthInput', 'slabKerfInput', 'slabTrimInput'].forEach(id => document.getElementById(id).addEventListener('input', () => { appState.project.slab.length = Number(document.getElementById('slabLengthInput').value) || 3200; appState.project.slab.width = Number(document.getElementById('slabWidthInput').value) || 1600; appState.project.slab.kerf = Number(document.getElementById('slabKerfInput').value) || 4; appState.project.slab.trim = Number(document.getElementById('slabTrimInput').value) || 0; appState.project.slab.preset = 'custom'; renderNestingView(); }));
+      document.getElementById('slabThicknessSelect').addEventListener('change', (e) => { appState.project.slab.thickness = Number(e.target.value) || 12; renderNestingView(); renderBlueprintView(); });
+      document.querySelectorAll('.orient-btn').forEach(btn => btn.addEventListener('click', () => { appState.project.slab.orientation = btn.dataset.orient; renderNestingView(); }));
+      document.getElementById('btnExecuteNesting').addEventListener('click', () => { renderNestingView(); showToast('Карту розкрою оновлено!', 'success'); });
+
+      [['metaProjectName', 'name'], ['metaClient', 'client'], ['metaMeasurer', 'measurer'], ['metaAddress', 'address'], ['metaDecor', 'decor'], ['metaNotes', 'notes']].forEach(([id, key]) => document.getElementById(id).addEventListener('input', (e) => { appState.project.meta[key] = e.target.value; if (key === 'name') document.getElementById('headerProjectName').textContent = e.target.value || 'Без назви'; }));
+      document.getElementById('btnQuickSave').addEventListener('click', () => saveCurrentProject(true));
+      document.getElementById('btnSaveFromNesting').addEventListener('click', () => saveCurrentProject(true));
+      document.getElementById('btnSaveProjectMain').addEventListener('click', () => saveCurrentProject(true));
+      document.getElementById('btnPickWorkSsdFolder').addEventListener('click', pickWorkSsdFolder);
+      document.getElementById('btnQuickPdf').addEventListener('click', generateProductionPdf);
+      document.getElementById('btnDownloadPdfFromNesting').addEventListener('click', generateProductionPdf);
+      document.getElementById('btnExportPdfMain').addEventListener('click', generateProductionPdf);
+      document.getElementById('btnNewProject').addEventListener('click', () => { appState.project = createBlankProject(); saveCurrentProject(false); showToast('Створено новий чистий замір', 'success'); switchTab('scan'); });
+
+      document.getElementById('savedProjectsList').addEventListener('click', (e) => {
+        const loadBtn = e.target.closest('[data-load-proj]');
+        if (loadBtn) { const found = appState.savedProjects.find(pr => pr.id === loadBtn.dataset.loadProj); if (found) { appState.project = normalizeProject(JSON.parse(JSON.stringify(found))); showToast(`Відкрито проєкт «${found.meta.name}»`, 'success'); refreshAllViews(); } return; }
+        const delBtn = e.target.closest('[data-del-proj]');
+        if (delBtn) {
+          const id = delBtn.dataset.delProj; appState.savedProjects = appState.savedProjects.filter(pr => pr.id !== id);
+          if (!appState.savedProjects.length) { appState.project = createDefaultProject(); appState.savedProjects.push(JSON.parse(JSON.stringify(appState.project))); }
+          else if (appState.project.id === id) appState.project = normalizeProject(JSON.parse(JSON.stringify(appState.savedProjects[0])));
+          persistSavedProjects(); showToast('Проєкт видалено', 'info'); refreshAllViews();
+        }
+      });
+
+      document.getElementById('btnExportJson').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(appState.project, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `StoneScan_${(appState.project.meta.name || 'project').replace(/\s+/g, '_')}.json`; a.click(); URL.revokeObjectURL(url);
+        showToast('Файл проєкту JSON завантажено', 'success');
+      });
+
+      document.getElementById('inputImportJson').addEventListener('change', (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try { const parsed = JSON.parse(reader.result); if (parsed && parsed.countertop && parsed.slab) { appState.project = normalizeProject(parsed); saveCurrentProject(false); showToast('Проєкт успішно імпортовано!', 'success'); refreshAllViews(); } else showToast('Невірний формат файлу проєкту', 'error'); }
+          catch (err) { showToast('Помилка читання JSON файлу', 'error'); }
+        };
+        reader.readAsText(file); e.target.value = '';
+      });
+
+      window.addEventListener('resize', () => { if (appState.activeTab === 'scan') renderScannerCanvas(); });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { loadSavedProjects(); bindEvents(); switchTab('scan'); });
+  </script>
+</body>
+</html>
